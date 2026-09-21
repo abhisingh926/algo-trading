@@ -47,6 +47,7 @@ function useInvalidateStrategies() {
     void qc.invalidateQueries({ queryKey: qk.dashboard });
     void qc.invalidateQueries({ queryKey: qk.systemStatus });
     void qc.invalidateQueries({ queryKey: qk.eventsAll });
+    void qc.invalidateQueries({ queryKey: qk.onboarding });
   };
 }
 

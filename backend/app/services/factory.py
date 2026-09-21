@@ -24,6 +24,7 @@ from app.services.auth_service import AuthService
 from app.services.backtest_service import BacktestService
 from app.services.broker_service import BrokerService
 from app.services.event_service import EventService
+from app.services.guide_service import GuideService
 from app.services.market_data_service import MarketDataService
 from app.services.order_service import OrderService
 from app.services.pnl_service import PnlService
@@ -228,6 +229,19 @@ class Services:
     def backtests(self) -> BacktestService:
         return BacktestService(
             self.backtest_repo, self.strategy_repo, self.market_data, self.events, self.settings
+        )
+
+    @cached_property
+    def guide(self) -> GuideService:
+        return GuideService(
+            self.strategy_repo,
+            self.backtest_repo,
+            self.trade_repo,
+            self.order_repo,
+            self.event_repo,
+            self.risk,
+            self.portfolio,
+            self.settings,
         )
 
     @cached_property

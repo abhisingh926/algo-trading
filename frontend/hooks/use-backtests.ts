@@ -37,6 +37,8 @@ export function useRunBacktest() {
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: qk.backtests });
       void qc.invalidateQueries({ queryKey: qk.eventsAll });
+      void qc.invalidateQueries({ queryKey: qk.onboarding });
+      void qc.invalidateQueries({ queryKey: qk.strategies });
     },
   });
 }
@@ -49,6 +51,8 @@ export function useDeleteBacktest() {
       toastSuccess("Backtest deleted");
       qc.removeQueries({ queryKey: qk.backtestReport(id) });
       void qc.invalidateQueries({ queryKey: qk.backtests });
+      void qc.invalidateQueries({ queryKey: qk.onboarding });
+      void qc.invalidateQueries({ queryKey: qk.strategies });
     },
     onError: toastError,
   });

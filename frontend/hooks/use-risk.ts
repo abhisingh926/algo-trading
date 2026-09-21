@@ -26,6 +26,7 @@ export function useUpdateRisk() {
     onSuccess: () => {
       toastSuccess("Risk limits saved");
       void qc.invalidateQueries({ queryKey: qk.risk });
+      void qc.invalidateQueries({ queryKey: qk.onboarding });
     },
     onError: toastError,
   });

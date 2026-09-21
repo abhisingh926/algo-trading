@@ -2,7 +2,9 @@
 
 import { DataTable, type Column } from "@/components/tables/data-table";
 import { ModeBadge, SideBadge, SignalStatusBadge, StrategyStatusBadge } from "@/components/trading/badges";
+import { StrategyReviewPanel } from "@/components/trading/strategy-review-panel";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useStrategyReview } from "@/hooks/use-guide";
 import { useStrategySignals } from "@/hooks/use-strategies";
 import { formatDateTime, formatDateTimeShort, formatFraction, formatINR, formatPrice } from "@/lib/format";
 import type { Signal, Strategy } from "@/types";
@@ -31,6 +33,7 @@ export function StrategySignalsSheet({
   onOpenChange: (open: boolean) => void;
 }) {
   const signals = useStrategySignals(strategy?.id ?? null, 50);
+  const review = useStrategyReview(strategy?.id ?? null);
   return (
     <Sheet open={!!strategy} onOpenChange={(o) => onOpenChange(o)}>
       <SheetContent className="w-full gap-0 overflow-y-auto data-[side=right]:sm:max-w-2xl">
@@ -70,6 +73,15 @@ export function StrategySignalsSheet({
                   Last error: {strategy.last_error}
                 </p>
               ) : null}
+              <StrategyReviewPanel
+                variant="full"
+                title="Good-practice review"
+                review={review.data}
+                isLoading={review.isLoading}
+                isFetching={review.isFetching}
+                error={review.error}
+                onRetry={() => void review.refetch()}
+              />
               <div>
                 <h3 className="mb-2 text-sm font-semibold">Recent signals</h3>
                 <DataTable

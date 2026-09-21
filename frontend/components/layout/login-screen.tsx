@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { CandlestickChart, Loader2 } from "lucide-react";
@@ -22,8 +22,12 @@ export function LoginScreen() {
   const [fullName, setFullName] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
+  // A newly registered user lands on the guide; everyone else on the dashboard.
+  const justRegistered = useRef(false);
   useEffect(() => {
-    if (state === "open" || state === "authenticated") router.replace("/dashboard");
+    if (state === "open" || state === "authenticated") {
+      router.replace(justRegistered.current ? "/guide" : "/dashboard");
+    }
   }, [state, router]);
 
   const firstUser = status ? !status.has_users : false;
@@ -36,6 +40,7 @@ export function LoginScreen() {
         : authService.login({ email: email.trim(), password }),
     onSuccess: (token) => {
       toastSuccess(registering ? "Account created" : "Signed in", token.user.email);
+      if (registering) justRegistered.current = true;
       signIn(token);
     },
     onError: (err) => {

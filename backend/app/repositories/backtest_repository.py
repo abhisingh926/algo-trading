@@ -3,9 +3,10 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Any
 
-from sqlalchemy import insert, select
+from sqlalchemy import func, insert, select
 from sqlalchemy.orm import undefer
 
+from app.domain.enums import BacktestStatus
 from app.models.backtest import Backtest, BacktestTrade
 from app.repositories.base import BaseRepository
 
@@ -33,3 +34,16 @@ class BacktestRepository(BaseRepository[Backtest]):
             .order_by(BacktestTrade.entry_time)
         )
         return (await self.session.scalars(stmt)).all()
+
+    async def latest_completed_for_strategy(self, strategy_id: str) -> Backtest | None:
+        stmt = (
+            select(Backtest)
+            .where(Backtest.strategy_id == strategy_id, Backtest.status == BacktestStatus.COMPLETED)
+            .order_by(Backtest.created_at.desc())
+            .limit(1)
+        )
+        return await self.session.scalar(stmt)
+
+    async def count_completed(self) -> int:
+        stmt = select(func.count()).select_from(Backtest).where(Backtest.status == BacktestStatus.COMPLETED)
+        return int(await self.session.scalar(stmt) or 0)

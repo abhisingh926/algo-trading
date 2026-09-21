@@ -1,6 +1,7 @@
 import {
   Activity,
   ArrowLeftRight,
+  BookOpen,
   Briefcase,
   FlaskConical,
   LayoutDashboard,
@@ -20,6 +21,7 @@ export interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/guide", label: "Guide", icon: BookOpen },
   { href: "/strategies", label: "Strategies", icon: Activity },
   { href: "/orders", label: "Orders", icon: ListOrdered },
   { href: "/positions", label: "Positions", icon: Briefcase },

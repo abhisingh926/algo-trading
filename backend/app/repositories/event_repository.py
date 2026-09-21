@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.domain.enums import EventLevel
 from app.models.event import SystemEvent
@@ -29,3 +29,7 @@ class EventRepository(BaseRepository[SystemEvent]):
         if strategy_id:
             stmt = stmt.where(SystemEvent.strategy_id == strategy_id)
         return (await self.session.scalars(stmt)).all()
+
+    async def count_by_type(self, event_type: str) -> int:
+        stmt = select(func.count()).select_from(SystemEvent).where(SystemEvent.event_type == event_type)
+        return int(await self.session.scalar(stmt) or 0)

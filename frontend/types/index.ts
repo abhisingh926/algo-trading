@@ -710,3 +710,68 @@ export interface HistoricalSyncResult {
   total: number;
   source: string;
 }
+
+// ---------- Guide (onboarding and best-practice review) ----------
+export type OnboardingStepKey =
+  | "paper_mode"
+  | "review_risk"
+  | "create_strategy"
+  | "run_backtest"
+  | "start_strategy"
+  | "first_order"
+  | "first_trade"
+  | "test_kill_switch";
+export interface OnboardingStep {
+  key: OnboardingStepKey;
+  title: string;
+  description: string;
+  /** Frontend route. */
+  href: string;
+  done: boolean;
+  /** Only test_kill_switch is optional. */
+  optional: boolean;
+}
+export interface Onboarding {
+  steps: OnboardingStep[];
+  completed: number;
+  total: number;
+  /** 0..100 */
+  percent: number;
+  next_step: string | null;
+  all_done: boolean;
+}
+export interface ReviewRequest {
+  strategy_id?: string;
+  strategy_type: StrategyType;
+  symbol: string;
+  exchange?: string;
+  timeframe: Timeframe;
+  capital: number;
+  risk_per_trade: number;
+  stop_loss_pct: number;
+  target_pct: number | null;
+  allow_short?: boolean;
+  trading_mode?: TradingMode;
+  parameters: Record<string, number>;
+}
+export type ReviewVerdict = "RECOMMENDED" | "CAUTION" | "NOT_RECOMMENDED";
+export type ReviewSeverity = "GOOD" | "INFO" | "WARN" | "RISK";
+export type ReviewCategory = "configuration" | "backtest" | "safety";
+export interface ReviewCheck {
+  key: string;
+  category: ReviewCategory;
+  severity: ReviewSeverity;
+  title: string;
+  detail: string;
+  suggestion: string | null;
+}
+export interface StrategyReview {
+  verdict: ReviewVerdict;
+  summary: string;
+  counts: { good: number; info: number; warn: number; risk: number };
+  /** Worst first. */
+  checks: ReviewCheck[];
+  has_backtest: boolean;
+  backtest_id: string | null;
+  disclaimer: string;
+}

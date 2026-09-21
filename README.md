@@ -18,20 +18,22 @@ management, paper trading, backtesting with realistic costs, and a Next.js tradi
 
 ## Contents
 
-1. [Architecture](#architecture)
-2. [Quick start with Docker](#quick-start-with-docker)
-3. [Local development setup](#local-development-setup)
-4. [Environment variables](#environment-variables)
-5. [Database migrations](#database-migrations)
-6. [Running tests](#running-tests)
-7. [Paper trading walkthrough](#paper-trading-walkthrough)
-8. [Backtesting](#backtesting)
-9. [Trading modes and the live trading guards](#trading-modes-and-the-live-trading-guards)
-10. [Dhan sandbox configuration](#dhan-sandbox-configuration)
-11. [Adding a broker](#adding-a-broker)
-12. [Logging and observability](#logging-and-observability)
-13. [Production deployment considerations](#production-deployment-considerations)
-14. [Known limitations](#known-limitations)
+1. [User guide for new users](docs/USER_GUIDE.md)
+2. [Architecture](#architecture)
+3. [Quick start with Docker](#quick-start-with-docker)
+4. [Local development setup](#local-development-setup)
+5. [Environment variables](#environment-variables)
+6. [Database migrations](#database-migrations)
+7. [Running tests](#running-tests)
+8. [Paper trading walkthrough](#paper-trading-walkthrough)
+9. [New users and the good-practice review](#new-users-and-the-good-practice-review)
+10. [Backtesting](#backtesting)
+11. [Trading modes and the live trading guards](#trading-modes-and-the-live-trading-guards)
+12. [Dhan sandbox configuration](#dhan-sandbox-configuration)
+13. [Adding a broker](#adding-a-broker)
+14. [Logging and observability](#logging-and-observability)
+15. [Production deployment considerations](#production-deployment-considerations)
+16. [Known limitations](#known-limitations)
 
 ## Architecture
 
@@ -109,10 +111,10 @@ The full API contract is in [docs/API_CONTRACT.md](docs/API_CONTRACT.md). Intera
 │   │   ├── strategies/ risk/ trading/ backtesting/ workers/ utils/
 │   │   └── api/v1/
 │   ├── alembic/                         migrations
-│   ├── tests/                           136 tests, no network, no real broker
+│   ├── tests/                           164 tests, no network, no real broker
 │   └── Dockerfile
 ├── frontend/                            Next.js App Router, Tailwind, shadcn/ui, TanStack Query, Recharts
-├── docs/API_CONTRACT.md
+├── docs/API_CONTRACT.md, docs/USER_GUIDE.md
 ├── docker-compose.yml  Makefile  .env.example
 ```
 
@@ -269,6 +271,19 @@ curl -X POST localhost:8000/api/v1/orders -H 'content-type: application/json' \
 ```
 
 The response description reads `PAPER order FILLED via PAPER`.
+
+## New users and the good-practice review
+
+[docs/USER_GUIDE.md](docs/USER_GUIDE.md) is a plain-language guide, also shown in the app under **Guide**.
+The Guide page has a getting-started checklist derived from what the user has actually done
+(`GET /api/v1/guide/onboarding`).
+
+The **good-practice review** (`POST /api/v1/strategies/review`, `GET /api/v1/strategies/{id}/review`) grades a
+strategy setup as `RECOMMENDED`, `CAUTION` or `NOT_RECOMMENDED` with explained checks: risk per trade, stop loss,
+reward to risk, timeframe and costs, indicator settings, backtest quality (length, trade count, profit factor,
+drawdown, costs, synthetic data, staleness) and, for real-money modes, the paper trading record.
+It is advisory only and never blocks an action. Thresholds are constants in
+`backend/app/risk/strategy_review.py` and are covered by `tests/test_review.py`.
 
 ## Backtesting
 

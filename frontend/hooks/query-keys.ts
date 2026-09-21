@@ -1,4 +1,4 @@
-import type { EventsQuery, OrdersQuery, PositionStatusFilter, TradesQuery } from "@/types";
+import type { EventsQuery, ReviewRequest, OrdersQuery, PositionStatusFilter, TradesQuery } from "@/types";
 
 export const qk = {
   authStatus: ["auth", "status"] as const,
@@ -11,6 +11,8 @@ export const qk = {
   dashboardSummary: ["dashboard", "summary"] as const,
   dashboardPnl: (days: number) => ["dashboard", "pnl", days] as const,
   dashboardPerformance: ["dashboard", "performance"] as const,
+  guide: ["guide"] as const,
+  onboarding: ["guide", "onboarding"] as const,
   brokers: ["brokers"] as const,
   brokersList: ["brokers", "list"] as const,
   brokerStatus: ["brokers", "status"] as const,
@@ -18,6 +20,8 @@ export const qk = {
   strategiesList: ["strategies", "list"] as const,
   strategyTypes: ["strategy-types"] as const,
   strategy: (id: string) => ["strategies", "detail", id] as const,
+  strategyReview: (id: string) => ["strategies", "review", id] as const,
+  strategyReviewDraft: (req: ReviewRequest) => ["strategies", "review-draft", req] as const,
   strategySignals: (id: string, limit: number) => ["strategies", "signals", id, limit] as const,
   orders: ["orders"] as const,
   ordersList: (q: OrdersQuery) => ["orders", "list", q] as const,

@@ -33,6 +33,7 @@ function useInvalidateOrders() {
     void qc.invalidateQueries({ queryKey: qk.trades });
     void qc.invalidateQueries({ queryKey: qk.dashboard });
     void qc.invalidateQueries({ queryKey: qk.risk });
+    void qc.invalidateQueries({ queryKey: qk.onboarding });
   };
 }
 

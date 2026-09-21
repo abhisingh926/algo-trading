@@ -262,6 +262,30 @@ Quote = { symbol, exchange, ltp, open, high, low, close, volume, timestamp, sour
 Candle = { timestamp, open, high, low, close, volume }
 ```
 
+## Guide (new-user onboarding and best-practice review)
+
+Both are advisory. Nothing here blocks starting a strategy.
+
+| Method | Path | Body | data |
+|---|---|---|---|
+| GET | `/guide/onboarding` | – | `Onboarding` |
+| POST | `/strategies/review` | `ReviewRequest` (a draft setup, works before the strategy is saved) | `StrategyReview` |
+| GET | `/strategies/{id}/review` | – | `StrategyReview` (also uses the strategy's latest backtest and paper record) |
+
+```
+Onboarding = { steps: OnboardingStep[], completed, total, percent (0..100), next_step: string|null, all_done: bool }
+OnboardingStep = { key: "paper_mode"|"review_risk"|"create_strategy"|"run_backtest"|"start_strategy"|"first_order"|"first_trade"|"test_kill_switch",
+                   title, description, href (frontend route), done: bool, optional: bool }   // only test_kill_switch is optional
+ReviewRequest = { strategy_id?: string, strategy_type, symbol, exchange = "NSE", timeframe, capital, risk_per_trade (fraction),
+                  stop_loss_pct (fraction), target_pct: number|null, allow_short = false, trading_mode = "PAPER", parameters: {key: number} }
+StrategyReview = { verdict: "RECOMMENDED"|"CAUTION"|"NOT_RECOMMENDED", summary: string,
+                   counts: {good, info, warn, risk}, checks: ReviewCheck[] (worst first),
+                   has_backtest: bool, backtest_id: string|null, disclaimer: string }
+ReviewCheck = { key, category: "configuration"|"backtest"|"safety", severity: "GOOD"|"INFO"|"WARN"|"RISK",
+                title, detail, suggestion: string|null }
+```
+Invalid strategy parameters do not return 422 from the review endpoints; they appear as a `RISK` check with key `config_valid`.
+
 ## Conventions and clarifications
 
 * **CORS**: the backend allows the origins in `CORS_ORIGINS` with the `Authorization` header.

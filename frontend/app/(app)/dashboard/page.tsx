@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ActiveStrategiesTable } from "@/components/dashboard/active-strategies-table";
+import { GettingStartedCard } from "@/components/dashboard/getting-started-card";
 import { EquityCurvePanel } from "@/components/dashboard/equity-curve-panel";
 import { OpenPositionsTable } from "@/components/dashboard/open-positions-table";
 import { PortfolioStats } from "@/components/dashboard/portfolio-stats";
@@ -14,6 +15,7 @@ export default function DashboardPage() {
     <>
       <PageHeader title="Dashboard" description="Portfolio, strategies and system health at a glance." />
       <div className="grid gap-5">
+        <GettingStartedCard />
         <PortfolioStats />
         <div className="grid items-start gap-5 xl:grid-cols-3">
           <EquityCurvePanel className="xl:col-span-2" />
