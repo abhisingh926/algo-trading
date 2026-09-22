@@ -38,6 +38,9 @@ _BASE_PRICES = {
     "WIPRO": 250.0,
     "TATAMOTORS": 700.0,
     "NIFTYBEES": 280.0,
+    "NIFTY": 24500.0,
+    "BANKNIFTY": 53000.0,
+    "INDIAVIX": 14.0,
 }
 # (period in minutes, amplitude in log-price)
 _WAVES = (
@@ -64,9 +67,10 @@ def _unit_hash(n: int, seed: int) -> float:
 
 
 class _SymbolModel:
-    __slots__ = ("base_log", "phases", "seed")
+    __slots__ = ("base_log", "index", "phases", "seed")
 
-    def __init__(self, key: str, symbol: str) -> None:
+    def __init__(self, key: str, symbol: str, index: bool = False) -> None:
+        self.index = index
         digest = hashlib.md5(key.encode(), usedforsecurity=False).digest()
         self.seed = int.from_bytes(digest[:4], "big")
         base = _BASE_PRICES.get(symbol) or 150.0 + (self.seed % 2850)
@@ -83,6 +87,8 @@ class _SymbolModel:
         return round(math.exp(value), 2)
 
     def volume(self, minute: int, span_minutes: int) -> int:
+        if self.index:
+            return 0  # indices do not trade
         return int((0.6 + 0.4 * (_unit_hash(minute, self.seed ^ 0x9E3779B9) + 1)) * 2500 * span_minutes)
 
 
@@ -96,7 +102,7 @@ class SimulatedMarketDataProvider(MarketDataProvider):
 
     def _model(self, ref: InstrumentRef) -> _SymbolModel:
         if ref.key not in self._models:
-            self._models[ref.key] = _SymbolModel(ref.key, ref.symbol)
+            self._models[ref.key] = _SymbolModel(ref.key, ref.symbol, ref.segment == "INDEX")
         return self._models[ref.key]
 
     def price_at(self, ref: InstrumentRef, when: datetime) -> float:
@@ -129,7 +135,12 @@ class SimulatedMarketDataProvider(MarketDataProvider):
         return open_at, close_at - open_at
 
     def _generate(
-        self, ref: InstrumentRef, interval: Timeframe, start: datetime, end: datetime
+        self,
+        ref: InstrumentRef,
+        interval: Timeframe,
+        start: datetime,
+        end: datetime,
+        session_only: bool = False,
     ) -> list[Candle]:
         model, now = self._model(ref), utcnow()
         start, end = ensure_utc(start), min(ensure_utc(end), now)
@@ -151,15 +162,21 @@ class SimulatedMarketDataProvider(MarketDataProvider):
                     candles.append(Candle(cursor, bar.open, bar.high, bar.low, bar.close, bar.volume))
                 cursor = floor_time(cursor + timedelta(hours=30), 1440)  # next IST midnight, DST-free
             else:
-                if self.always_open or in_market_session(cursor):
+                if (self.always_open and not session_only) or in_market_session(cursor):
                     candles.append(self._bar(model, cursor, step, now))
                 cursor += step
         return candles
 
     async def get_historical_data(
-        self, symbol: InstrumentRef, interval: Timeframe, start: datetime, end: datetime
+        self,
+        symbol: InstrumentRef,
+        interval: Timeframe,
+        start: datetime,
+        end: datetime,
+        *,
+        session_only: bool = False,
     ) -> list[Candle]:
-        return await asyncio.to_thread(self._generate, symbol, interval, start, end)
+        return await asyncio.to_thread(self._generate, symbol, interval, start, end, session_only)
 
     # ---- quotes --------------------------------------------------------------------------------
     def _quote(self, ref: InstrumentRef, now: datetime) -> Quote:

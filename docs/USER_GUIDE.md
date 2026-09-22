@@ -168,7 +168,32 @@ Start with an amount you can afford to lose completely.
 * **Everyone shares one workspace.** All users see the same strategies, orders, positions and trades, and any user can start, stop or kill trading. There are no per-user portfolios or roles yet. Only add people you trust with full control.
 * There is no password reset screen yet. An administrator can reset one directly in the database.
 
-## 11. Troubleshooting
+## 11. Market research
+
+The **Research** section helps you decide which stocks deserve a closer look. It is decision support: it never places an
+order and it never tells you to buy or sell.
+
+1. Open **Research** and choose **New Research Scan**. Pick the universe (NIFTY 50 to start) and a depth (Quick is fastest).
+2. Watch the agent panel. Some agents are marked **not available** (news, company data, fundamentals). That is deliberate: they need
+   data sources that are not connected yet, and every report says what it did not assess.
+3. Read **Top Research Candidates**. Click a stock for its full report: the score and its breakdown, the evidence behind each part,
+   risks, what would invalidate the setup, and where each number came from.
+
+How to read a report:
+
+* **Research Score** (0 to 100) says how well the setup measures up against explicit rules. **Data Confidence** says how far to trust the
+  data behind it. They are separate. A high score with low confidence means "looks good, but the data is weak".
+* **Synthetic data banner.** With the default test feed the prices are generated, not real, and confidence is capped at 30.
+  Connect real market data before drawing any conclusion.
+* **Not assessed** is not zero. The score only covers what could be measured, and the report shows how much that was.
+* **Historical statistics** show a success rate only when there are at least 30 past examples. Small samples show a count and no rate.
+* Check **What would invalidate the setup** before acting, and use paper trading first.
+* The score has **not** been proven to predict profit. Treat it as a way to organise your own research.
+
+Administrators can review and change the scoring weights under **Research, Settings**. A new set of weights changes nothing until an
+administrator approves it. More detail: [RESEARCH.md](RESEARCH.md).
+
+## 12. Troubleshooting
 
 | Problem | Likely cause |
 |---|---|
@@ -180,7 +205,7 @@ Start with an amount you can afford to lose completely.
 | Backtest is slow | A 1-minute test over months is millions of steps. Try 5 minutes or a shorter range. |
 | "Cannot reach backend" | The backend is not running. Start it with `docker compose up -d`. |
 
-## 12. Glossary
+## 13. Glossary
 
 * **Signal**: the strategy's BUY, SELL or HOLD decision for the latest candle.
 * **Stop loss**: the price at which a losing position is closed to limit the loss.

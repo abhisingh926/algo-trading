@@ -1,0 +1,9 @@
+{
+  "success": false,
+  "message": "Not available yet",
+  "status": {
+    "code": 501,
+    "description": "No news source is connected yet. News and catalyst analysis is planned for phase 2 and needs a licensed or permitted feed plus an LLM key."
+  },
+  "data": null
+}

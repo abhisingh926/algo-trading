@@ -77,6 +77,8 @@ class Settings(BaseSettings):
     market_data_poll_seconds: float = 3
     portfolio_snapshot_seconds: float = 60
     order_submit_max_retries: int = 3
+    research_fetch_concurrency: int = 4
+    research_history_days: int = 400
     order_retry_backoff_seconds: float = 0.5
     broker_http_timeout_seconds: float = 10
 

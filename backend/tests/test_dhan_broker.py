@@ -306,3 +306,63 @@ def test_logs_never_contain_secrets():
     record.access_token, record.client_secret, record.symbol = TOKEN, "s3cr3t", "INFY"
     line = JsonFormatter().format(record)
     assert TOKEN not in line and "s3cr3t" not in line and '"symbol": "INFY"' in line
+
+
+def test_quote_maps_market_depth_to_bid_ask_and_never_invents_one():
+    from app.brokers.dhan import mapper
+
+    now = datetime(2026, 1, 5, 5, 0, tzinfo=UTC)
+    with_depth = mapper.to_quote(
+        REL,
+        {
+            "last_price": 1000.0,
+            "volume": 5,
+            "ohlc": {"open": 1, "high": 2, "low": 1, "close": 1},
+            "depth": {
+                "buy": [{"quantity": 10, "orders": 1, "price": 999.95}],
+                "sell": [{"quantity": 12, "orders": 2, "price": 1000.05}],
+            },
+        },
+        now,
+    )
+    assert (with_depth.bid, with_depth.ask) == (999.95, 1000.05)
+    without = mapper.to_quote(REL, {"last_price": 1000.0, "volume": 5, "ohlc": {}}, now)
+    assert without.bid is None and without.ask is None  # spread is unknown, not guessed
+
+
+async def test_index_instruments_use_the_index_segment():
+    from app.brokers.dhan import mapper
+
+    nifty = InstrumentRef("NIFTY", "NSE", "13", "INDEX")
+    assert mapper.segment(nifty) == "IDX_I" and mapper.segment(REL) == "NSE_EQ"
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["body"] = json.loads(request.content)
+        return httpx.Response(
+            200,
+            json={
+                "open": [1],
+                "high": [2],
+                "low": [1],
+                "close": [2],
+                "volume": [0],
+                "timestamp": [1767585600],
+            },
+        )
+
+    provider = DhanMarketData(
+        DhanClient("https://api.dhan.co/v2", "1", TOKEN, transport=httpx.MockTransport(handler))
+    )
+    await provider.get_historical_data(
+        nifty,
+        Timeframe.M15,
+        datetime(2026, 1, 5, tzinfo=UTC),
+        datetime(2026, 1, 6, tzinfo=UTC),
+        session_only=True,
+    )
+    assert (
+        seen["body"]["exchangeSegment"] == "IDX_I"
+        and seen["body"]["instrument"] == "INDEX"
+        and seen["body"]["securityId"] == "13"
+    )

@@ -286,6 +286,44 @@ ReviewCheck = { key, category: "configuration"|"backtest"|"safety", severity: "G
 ```
 Invalid strategy parameters do not return 422 from the review endpoints; they appear as a `RISK` check with key `config_valid`.
 
+## Research (AI-assisted market research, phase 1)
+
+Exact schemas: `docs/research_openapi.json` (generated from the backend). Real example responses: `docs/research_samples/*.json`.
+Everything here is research and decision support. It never places orders and never says "buy".
+
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/research/run` | body `{market:"NSE", universe:"NIFTY50"\|"CUSTOM"\|<name>, symbols?:[..] (CUSTOM), research_type:"INTRADAY", depth:"QUICK"\|"STANDARD"\|"DEEP", as_of?: ISO datetime}`. Starts a background run, returns `ResearchRun` (status PENDING). 409 if a run is already active. 422 for bad input |
+| GET | `/research/summary` | `{latest_run, active_run}` for dashboards |
+| GET | `/research/runs?limit&offset` | recent runs, newest first (no `agents`) |
+| GET | `/research/runs/{id}` | one run with `agents[]` (live progress: poll every 2 seconds while status is PENDING or RUNNING) |
+| GET | `/research/candidates` | "Top Research Candidates" of the latest completed run. Query: `run_id, min_score, min_confidence, min_rel_volume, sector, risk (LOW\|MEDIUM\|HIGH), direction, min_price, max_price, sort (score\|confidence\|rel_volume\|change\|atr\|price\|symbol\|initial), order (desc\|asc), include_unanalyzed, limit` -> `{run, items[], sectors[], total}` |
+| GET | `/research/candidates/{symbol}` | one candidate summary |
+| GET | `/research/market` | `{run_id, run_number, generated_at, is_synthetic, data_source, context: MarketContext}` (regime with factors, indices, VIX, breadth, sectors) |
+| GET | `/research/sectors` | sector rotation table |
+| GET | `/research/{symbol}` | the full `ResearchReport` (`?run_id=` for a specific run) |
+| GET | `/research/{symbol}/history` | one summary per run |
+| GET | `/research/{symbol}/score-history` | `{points[], changes[]}` with explained score changes |
+| GET | `/research/{symbol}/technical`, `/risk`, `/sources` | slices of the report |
+| GET | `/research/{symbol}/news`, `/fundamentals` | always **501** for now: no data source is connected |
+| GET | `/research/{symbol}/export?format=json\|csv` | file download (send the bearer token, so fetch as a blob) |
+| GET/POST | `/research/weights`, POST `/research/weights/{id}/approve` | scoring weights. A proposal changes nothing until approved; approval needs an administrator |
+| GET/PUT | `/research/source-registry`, `/research/source-registry/{id}` | source reliability, enabled, connected |
+| GET/PUT | `/research/universes`, `/research/universes/{name}` | universe membership (NIFTY50 seeded; list is approximate) |
+
+Semantics the UI must respect:
+
+* **`research_score` (0..100, or null)** and **`data_confidence` (0..100)** are separate numbers and must be shown separately.
+  `score_coverage_pct` says how much of the scoring weight could be assessed. Components with `available=false` are "not assessed", never zero.
+* `is_synthetic=true` means the prices are test data from the simulated feed. Show a prominent banner. Data confidence is capped at 30 in that case.
+* `market_state` is OPEN, PRE_MARKET, POST_MARKET or CLOSED. When it is not OPEN the analysis is of the last regular session, not live data.
+* `warnings[]` (severity INFO, WARNING, HIGH), `risks[]`, `invalidation[]`, `why_listed[]` and `not_assessed[]` are plain-language lists to show as they are.
+* `verification.claims[].status` is VERIFIED, PARTIALLY_VERIFIED, CONFLICTING, UNVERIFIED or STALE. CONFLICTING must show both values and the `resolution` text. One provider can never reach VERIFIED.
+* `score.components[].evidence[]` items have `passed` true (tick), false (cross) or null (neutral) and a `source_key` that points into `report.sources[]`.
+* `agents[]` in a report and in a run include NOT_AVAILABLE agents (data research, news, fundamentals). Show them as not available, with their message.
+* Historical statistics: a `PatternStat` with `sample_adequate=false` has no rates. Show its `occurrences` and note, greyed out.
+* Never label anything "best stocks" or "buy". The list is "Top Research Candidates".
+
 ## Conventions and clarifications
 
 * **CORS**: the backend allows the origins in `CORS_ORIGINS` with the `Authorization` header.

@@ -19,7 +19,7 @@ class CandleRecord(Base):
 
     __tablename__ = "candles"
     __table_args__ = (
-        UniqueConstraint("symbol", "exchange", "timeframe", "timestamp", name="uq_candles_bar"),
+        UniqueConstraint("symbol", "exchange", "timeframe", "timestamp", "source", name="uq_candles_bar"),
     )
 
     id: Mapped[int] = mapped_column(

@@ -53,7 +53,13 @@ class FakeMarketData(MarketDataProvider):
         ]
 
     async def get_historical_data(
-        self, symbol: InstrumentRef, interval: Timeframe, start: datetime, end: datetime
+        self,
+        symbol: InstrumentRef,
+        interval: Timeframe,
+        start: datetime,
+        end: datetime,
+        *,
+        session_only: bool = False,
     ) -> list[Candle]:
         return [c for c in self.candles.get(symbol.symbol, []) if start <= c.timestamp <= end]
 

@@ -1,0 +1,81 @@
+{
+  "success": true,
+  "message": "Sector rotation",
+  "status": {
+    "code": 200,
+    "description": "Sector rotation"
+  },
+  "data": {
+    "run_id": "0abede4a-8dc7-4669-aaa9-f31fc9cf1613",
+    "run_number": 1001,
+    "as_of": "2026-09-21T21:04:03.494928Z",
+    "is_synthetic": true,
+    "sectors": [
+      {
+        "sector": "Energy",
+        "constituents": 1,
+        "ret_1d_pct": 3.7532479356786386,
+        "ret_5d_pct": 5.805889453122215,
+        "rel_strength_1d": 6.402950263910867,
+        "rel_strength_5d": 3.620763058239218,
+        "avg_rel_volume": 0.9428855333798992,
+        "breadth_pct": 100.0,
+        "momentum": 59.599540052154964,
+        "trend": "UP",
+        "rank": 1
+      },
+      {
+        "sector": "FMCG",
+        "constituents": 1,
+        "ret_1d_pct": 3.53325950915504,
+        "ret_5d_pct": 0.7114406673513818,
+        "rel_strength_1d": 6.182961837387269,
+        "rel_strength_5d": -1.473685727531615,
+        "avg_rel_volume": 1.092943326385004,
+        "breadth_pct": 100.0,
+        "momentum": 46.49045231588785,
+        "trend": "SIDEWAYS",
+        "rank": 2
+      },
+      {
+        "sector": "Banking",
+        "constituents": 3,
+        "ret_1d_pct": -1.675838642662205,
+        "ret_5d_pct": -0.0008130861662107117,
+        "rel_strength_1d": 0.9738636855700236,
+        "rel_strength_5d": -2.1859394810492074,
+        "avg_rel_volume": 0.9986786864828568,
+        "breadth_pct": 33.33333333333333,
+        "momentum": 51.63553993581228,
+        "trend": "DOWN",
+        "rank": 3
+      },
+      {
+        "sector": "IT",
+        "constituents": 2,
+        "ret_1d_pct": -1.372772111104481,
+        "ret_5d_pct": -5.182825271403862,
+        "rel_strength_1d": 1.2769302171277475,
+        "rel_strength_5d": -7.367951666286859,
+        "avg_rel_volume": 0.9800583972761623,
+        "breadth_pct": 50.0,
+        "momentum": 43.609382631409176,
+        "trend": "SIDEWAYS",
+        "rank": 4
+      },
+      {
+        "sector": "Capital Goods",
+        "constituents": 1,
+        "ret_1d_pct": -2.8133215244682486,
+        "ret_5d_pct": -4.207393284022598,
+        "rel_strength_1d": -0.16361919623602006,
+        "rel_strength_5d": -6.392519678905595,
+        "avg_rel_volume": 1.0210434892664968,
+        "breadth_pct": 0.0,
+        "momentum": 41.60005941170802,
+        "trend": "DOWN",
+        "rank": 5
+      }
+    ]
+  }
+}

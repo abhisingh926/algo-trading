@@ -21,9 +21,18 @@ class MarketDataProvider(ABC):
 
     @abstractmethod
     async def get_historical_data(
-        self, symbol: InstrumentRef, interval: Timeframe, start: datetime, end: datetime
+        self,
+        symbol: InstrumentRef,
+        interval: Timeframe,
+        start: datetime,
+        end: datetime,
+        *,
+        session_only: bool = False,
     ) -> list[Candle]:
-        """Closed and in-progress candles with start <= timestamp <= end, oldest first."""
+        """Closed and in-progress candles with start <= timestamp <= end, oldest first.
+
+        `session_only` is a hint that the caller only needs regular exchange-session bars, so a provider that
+        would otherwise produce bars outside the session (the 24x7 simulated feed) can skip them."""
 
     async def subscribe(self, symbols: Sequence[InstrumentRef]) -> AsyncIterator[Quote]:
         """Stream of quotes. Default implementation polls `get_quote`; adapters with a real

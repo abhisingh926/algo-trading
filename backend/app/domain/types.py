@@ -14,6 +14,7 @@ class InstrumentRef:
     symbol: str
     exchange: str = "NSE"
     exchange_token: str | None = None
+    segment: str = "EQUITY"  # EQUITY | INDEX
 
     @property
     def key(self) -> str:
@@ -42,6 +43,8 @@ class Quote:
     volume: int
     timestamp: datetime
     source: str
+    bid: float | None = None  # best bid / ask when the provider supplies market depth, else None
+    ask: float | None = None
 
 
 @dataclass(frozen=True, slots=True)

@@ -153,3 +153,13 @@ export function humanize(value: string | null | undefined): string {
   const s = value.replace(/[_-]+/g, " ").toLowerCase();
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+
+/** 12336 -> "12.3 s", 72 -> "72 ms", 125000 -> "2 min 5 s" */
+export function formatDuration(ms: number | null | undefined): string {
+  if (ms === null || ms === undefined || Number.isNaN(ms)) return DASH;
+  if (ms < 1000) return `${Math.round(ms)} ms`;
+  const s = ms / 1000;
+  if (s < 60) return `${s.toFixed(1)} s`;
+  const m = Math.floor(s / 60);
+  return `${m} min ${Math.round(s - m * 60)} s`;
+}

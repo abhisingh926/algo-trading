@@ -14,6 +14,7 @@ from app.core.config import Settings
 from app.core.database import Database
 from app.market_data.base import MarketDataProvider
 from app.market_data.factory import build_market_data_provider
+from app.research.runner import ResearchRunner
 from app.utils.time import utcnow
 
 
@@ -53,6 +54,7 @@ class AppContainer:
     quote_cache: QuoteCache
     brokers: BrokerRegistry
     workers: WorkerRegistry = field(default_factory=WorkerRegistry)
+    research_runner: ResearchRunner = field(default_factory=ResearchRunner)
     fill_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
 
     @classmethod
@@ -66,15 +68,18 @@ class AppContainer:
         use_redis: bool = True,
     ) -> AppContainer:
         provider = market_data or build_market_data_provider(settings)
-        return cls(
+        container = cls(
             settings=settings,
             db=db or Database(settings.database_url, settings.database_echo),
             market_data=provider,
             quote_cache=QuoteCache(settings.redis_url if use_redis else None),
             brokers=BrokerRegistry(settings, provider, broker_transport),
         )
+        container.research_runner.bind(container)
+        return container
 
     async def close(self) -> None:
+        await self.research_runner.shutdown()
         await self.brokers.close()
         await self.market_data.close()
         await self.quote_cache.close()

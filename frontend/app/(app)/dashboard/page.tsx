@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ActiveStrategiesTable } from "@/components/dashboard/active-strategies-table";
+import { ResearchCard } from "@/components/dashboard/research-card";
 import { GettingStartedCard } from "@/components/dashboard/getting-started-card";
 import { EquityCurvePanel } from "@/components/dashboard/equity-curve-panel";
 import { OpenPositionsTable } from "@/components/dashboard/open-positions-table";
@@ -31,6 +32,7 @@ export default function DashboardPage() {
             <OpenPositionsTable />
           </Section>
         </div>
+        <ResearchCard />
         <Section title="Recent Orders">
           <RecentOrdersTable />
         </Section>

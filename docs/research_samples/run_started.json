@@ -1,0 +1,143 @@
+{
+  "success": true,
+  "message": "Research run",
+  "status": {
+    "code": 200,
+    "description": "Research run"
+  },
+  "data": {
+    "id": "ba5097b9-e447-4af0-98e2-e9270e64079c",
+    "run_number": 1000,
+    "status": "COMPLETED",
+    "market": "NSE",
+    "universe": "CUSTOM",
+    "research_type": "INTRADAY",
+    "depth": "STANDARD",
+    "as_of": "2026-09-19T21:03:50.980767Z",
+    "is_live": false,
+    "market_state": "CLOSED",
+    "data_source": "simulated",
+    "is_synthetic": true,
+    "weight_set_id": "61930e33-ef7e-4f4f-9f79-ebb2d8de791d",
+    "requested_symbols": [
+      "RELIANCE",
+      "TCS",
+      "INFY",
+      "HDFCBANK",
+      "ICICIBANK",
+      "SBIN",
+      "ITC",
+      "LT"
+    ],
+    "candidates_scanned": 8,
+    "candidates_analyzed": 8,
+    "sources_checked": 32,
+    "conflicts_found": 0,
+    "started_at": "2026-09-21T21:03:51.134557Z",
+    "completed_at": "2026-09-21T21:04:03.491493Z",
+    "duration_ms": 12336,
+    "error_message": null,
+    "created_at": "2026-09-21T21:03:51.085249Z",
+    "agents": [
+      {
+        "agent": "MarketScannerAgent",
+        "label": "Market Scanner",
+        "status": "SUCCESS",
+        "started_at": "2026-09-21T21:03:51.137068Z",
+        "finished_at": "2026-09-21T21:04:03.308300Z",
+        "duration_ms": 12171,
+        "records": 8,
+        "warnings": null,
+        "message": "8 scanned, 8 selected"
+      },
+      {
+        "agent": "MarketResearchAgent",
+        "label": "Data Research",
+        "status": "NOT_AVAILABLE",
+        "started_at": null,
+        "finished_at": null,
+        "duration_ms": null,
+        "records": 0,
+        "warnings": null,
+        "message": "Company data, announcements and corporate events need a licensed or permitted data source (planned phase 2)."
+      },
+      {
+        "agent": "DataVerificationAgent",
+        "label": "Data Verification",
+        "status": "SUCCESS",
+        "started_at": "2026-09-21T21:04:03.312730Z",
+        "finished_at": "2026-09-21T21:04:03.490938Z",
+        "duration_ms": 24,
+        "records": 8,
+        "warnings": [],
+        "message": "Verified 8 symbols"
+      },
+      {
+        "agent": "HistoricalTechnicalAgent",
+        "label": "Historical & Technical Analysis",
+        "status": "SUCCESS",
+        "started_at": "2026-09-21T21:04:03.309762Z",
+        "finished_at": "2026-09-21T21:04:03.488973Z",
+        "duration_ms": 72,
+        "records": 8,
+        "warnings": null,
+        "message": "Technical analysis and historical setup statistics"
+      },
+      {
+        "agent": "FundamentalResearchAgent",
+        "label": "Fundamental Analysis",
+        "status": "NOT_AVAILABLE",
+        "started_at": null,
+        "finished_at": null,
+        "duration_ms": null,
+        "records": 0,
+        "warnings": null,
+        "message": "Fundamentals need a data vendor subscription (planned phase 3)."
+      },
+      {
+        "agent": "NewsCatalystAgent",
+        "label": "News & Catalyst Analysis",
+        "status": "NOT_AVAILABLE",
+        "started_at": null,
+        "finished_at": null,
+        "duration_ms": null,
+        "records": 0,
+        "warnings": null,
+        "message": "News analysis needs a news source and an LLM key (planned phase 2)."
+      },
+      {
+        "agent": "MarketRiskAgent",
+        "label": "Market & Risk Analysis",
+        "status": "SUCCESS",
+        "started_at": "2026-09-21T21:04:03.297102Z",
+        "finished_at": "2026-09-21T21:04:03.487255Z",
+        "duration_ms": 11,
+        "records": 9,
+        "warnings": null,
+        "message": "Market regime plus risk checks for 8 symbols"
+      },
+      {
+        "agent": "QuantScoringAgent",
+        "label": "Quant Scoring",
+        "status": "SUCCESS",
+        "started_at": "2026-09-21T21:04:03.310745Z",
+        "finished_at": "2026-09-21T21:04:03.489677Z",
+        "duration_ms": 0,
+        "records": 8,
+        "warnings": null,
+        "message": "Scored 8 symbols with the deterministic model"
+      },
+      {
+        "agent": "ResearchSynthesizerAgent",
+        "label": "Research Synthesis",
+        "status": "SUCCESS",
+        "started_at": "2026-09-21T21:04:03.311739Z",
+        "finished_at": "2026-09-21T21:04:03.490322Z",
+        "duration_ms": 0,
+        "records": 8,
+        "warnings": null,
+        "message": "Built 8 reports"
+      }
+    ]
+  }
+}

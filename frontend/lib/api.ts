@@ -167,6 +167,48 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   );
 }
 
+/** Downloads a file (with the bearer token) and returns it as a Blob plus the server-suggested filename. */
+export async function requestBlob(
+  path: string,
+  query?: object,
+): Promise<{ blob: Blob; filename: string | null }> {
+  const headers: Record<string, string> = {};
+  const token = tokenStore.get();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  let response: Response;
+  try {
+    response = await fetch(buildUrl(path, query), { method: "GET", headers, cache: "no-store" });
+  } catch {
+    throw new ApiError(
+      "Cannot reach the trading backend",
+      0,
+      `Network error while calling ${API_BASE_URL}. Check that the backend is running.`,
+      null,
+    );
+  }
+  if (response.status === 401) tokenStore.clear();
+  if (!response.ok) {
+    let payload: unknown = null;
+    try {
+      payload = await response.json();
+    } catch {
+      payload = null;
+    }
+    if (isEnvelope(payload)) {
+      throw new ApiError(
+        payload.message || "Download failed",
+        payload.status?.code ?? response.status,
+        payload.status?.description ?? response.statusText,
+        payload.data,
+      );
+    }
+    throw new ApiError("Download failed", response.status, response.statusText, payload);
+  }
+  const disposition = response.headers.get("Content-Disposition") ?? "";
+  const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disposition);
+  return { blob: await response.blob(), filename: match ? decodeURIComponent(match[1]) : null };
+}
+
 export const api = {
   get: <T>(path: string, query?: object, signal?: AbortSignal) =>
     request<T>(path, { query, signal }),

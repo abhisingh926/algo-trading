@@ -1,0 +1,1624 @@
+{
+  "success": true,
+  "message": "Research report for SBIN",
+  "status": {
+    "code": 200,
+    "description": "Research and decision support only. Not investment advice."
+  },
+  "data": {
+    "symbol": "SBIN",
+    "company": "State Bank of India",
+    "sector": "Banking",
+    "run_id": "0abede4a-8dc7-4669-aaa9-f31fc9cf1613",
+    "generated_at": "2026-09-21T21:04:04.886183Z",
+    "as_of": "2026-09-21T21:04:03.494928Z",
+    "market_state": "PRE_MARKET",
+    "data_source": "simulated",
+    "is_synthetic": true,
+    "research_score": 82.0,
+    "data_confidence": 30.0,
+    "score_coverage_pct": 90.0,
+    "direction": "BULLISH",
+    "setup_quality": "STRONG",
+    "risk_level": "MEDIUM",
+    "labels": {
+      "intraday_setup": "Strong",
+      "market_regime": "Bullish",
+      "sector": "Positive",
+      "liquidity": "Good",
+      "momentum": "Strong",
+      "volume": "1.0x average",
+      "volatility": "Suitable",
+      "news_catalyst": "Not assessed",
+      "technical_structure": "Excellent",
+      "historical_setup": "Neutral",
+      "risk": "Medium"
+    },
+    "overview": {
+      "price": 902.28,
+      "change": 30.74000000000001,
+      "change_pct": 3.527089978658471,
+      "volume": 963525,
+      "avg_volume": 941123.35,
+      "market_cap": null,
+      "sector": "Banking",
+      "industry": null,
+      "exchange": "NSE"
+    },
+    "price": {
+      "price": 902.28,
+      "prev_close": 871.54,
+      "day_open": 891.74,
+      "day_high": 902.28,
+      "day_low": 888.19,
+      "change": 30.74000000000001,
+      "change_pct": 3.527089978658471,
+      "gap_pct": 2.317736420588856,
+      "ret_5d_pct": 6.690315714792461,
+      "ret_20d_pct": 3.3267294985284357,
+      "volume": 963525,
+      "avg_volume": 941123.35,
+      "rel_volume": 1.0238030965866483,
+      "volume_spike": false,
+      "avg_traded_value_cr": 80.0651393728,
+      "session_date": "2026-09-21",
+      "bars_in_session": 25,
+      "last_bar_time": "2026-09-21T09:45:00Z",
+      "bid": null,
+      "ask": null,
+      "spread_bps": null
+    },
+    "volatility": {
+      "atr": 23.68344047573542,
+      "atr_pct": 2.62484378194523,
+      "hist_vol_pct": 36.537116168577526,
+      "intraday_range_pct": 1.6166785230740894,
+      "avg_daily_range_pct": 1.5564728232659806,
+      "bb_width_pct": 15.17215934657798
+    },
+    "score": {
+      "research_score": 82.0,
+      "raw_score": 82.0,
+      "capped": false,
+      "cap_reason": null,
+      "available_points": 90.0,
+      "total_points": 100.0,
+      "coverage_pct": 90.0,
+      "components": [
+        {
+          "key": "market_regime",
+          "label": "Market Regime",
+          "points": 6.65,
+          "max_points": 10.0,
+          "available": true,
+          "rating": "GOOD",
+          "summary": "Market is bullish; the setup direction is aligned with it.",
+          "evidence": [
+            {
+              "label": "Market regime",
+              "value": "bullish (confidence 50%)",
+              "passed": null,
+              "source_key": null
+            },
+            {
+              "label": "NIFTY vs 20-day EMA",
+              "value": "25,280 vs 24,609",
+              "passed": true,
+              "source_key": null
+            },
+            {
+              "label": "NIFTY vs 50-day EMA",
+              "value": "25,280 vs 24,528",
+              "passed": true,
+              "source_key": null
+            },
+            {
+              "label": "NIFTY 20-day EMA vs 50-day EMA",
+              "value": "24,609 vs 24,528",
+              "passed": true,
+              "source_key": null
+            },
+            {
+              "label": "NIFTY day change",
+              "value": "-2.65%",
+              "passed": false,
+              "source_key": null
+            },
+            {
+              "label": "BANK NIFTY vs 20-day EMA",
+              "value": "53,466 vs 52,513",
+              "passed": true,
+              "source_key": null
+            },
+            {
+              "label": "Advance / decline (scanned universe)",
+              "value": "4 up, 4 down",
+              "passed": null,
+              "source_key": null
+            },
+            {
+              "label": "Stocks above 20-day EMA (scanned universe)",
+              "value": "38%",
+              "passed": false,
+              "source_key": null
+            },
+            {
+              "label": "India VIX",
+              "value": "13.2",
+              "passed": null,
+              "source_key": null
+            }
+          ],
+          "metrics": {
+            "regime": "BULLISH",
+            "score": 0.33
+          },
+          "sources": []
+        },
+        {
+          "key": "liquidity",
+          "label": "Liquidity",
+          "points": 11.16,
+          "max_points": 15.0,
+          "available": true,
+          "rating": "GOOD",
+          "summary": "Average traded value \u20b980.1 crore per day.",
+          "evidence": [
+            {
+              "label": "Average daily traded value (20 sessions)",
+              "value": "\u20b980.1 crore",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "Average daily volume",
+              "value": "941,123 shares",
+              "passed": null,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "Bid/ask spread",
+              "value": "not available from this data source",
+              "passed": null,
+              "source_key": null
+            }
+          ],
+          "metrics": {
+            "avg_traded_value_cr": 80.0651393728,
+            "avg_volume": 941123.35,
+            "spread_bps": null
+          },
+          "sources": [
+            "candles_15m"
+          ]
+        },
+        {
+          "key": "price_action",
+          "label": "Price Action",
+          "points": 13.88,
+          "max_points": 15.0,
+          "available": true,
+          "rating": "EXCELLENT",
+          "summary": "Bullish structure checked against VWAP, key levels and the gap.",
+          "evidence": [
+            {
+              "label": "Daily swing structure",
+              "value": "higher highs and higher lows",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "Price vs VWAP",
+              "value": "+0.78% (above)",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "Breakout of prior-day / opening range",
+              "value": "yes, in the setup direction",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "Nearby resistance level",
+              "value": "\u20b9905.55 is within 0.3 ATR of price",
+              "passed": false,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "Gap behaviour",
+              "value": "gap up 2.3%, holding",
+              "passed": true,
+              "source_key": "candles_15m"
+            }
+          ],
+          "metrics": {
+            "direction": "BULLISH",
+            "structure": "HIGHER_HIGHS_LOWS",
+            "breakout": "UP"
+          },
+          "sources": [
+            "candles_15m"
+          ]
+        },
+        {
+          "key": "momentum",
+          "label": "Momentum",
+          "points": 9.86,
+          "max_points": 10.0,
+          "available": true,
+          "rating": "EXCELLENT",
+          "summary": "Momentum measured in the bullish direction.",
+          "evidence": [
+            {
+              "label": "RSI (15m / daily)",
+              "value": "76 / 60",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "MACD histogram (15m)",
+              "value": "+0.004",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "ADX (trend strength)",
+              "value": "30",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "10-day rate of change",
+              "value": "+9.7%",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "Day return vs NIFTY",
+              "value": "+6.18 percentage points",
+              "passed": true,
+              "source_key": "candles_15m"
+            }
+          ],
+          "metrics": {
+            "direction_used": "BULLISH"
+          },
+          "sources": [
+            "candles_15m"
+          ]
+        },
+        {
+          "key": "volume",
+          "label": "Volume",
+          "points": 6.43,
+          "max_points": 10.0,
+          "available": true,
+          "rating": "GOOD",
+          "summary": "Volume compared with the average for this point in the session.",
+          "evidence": [
+            {
+              "label": "Relative volume (vs same time of day)",
+              "value": "1.02x",
+              "passed": null,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "Price / volume relationship",
+              "value": "price up and volume up",
+              "passed": true,
+              "source_key": "candles_15m"
+            }
+          ],
+          "metrics": {
+            "rel_volume": 1.0238030965866483,
+            "volume_spike": false
+          },
+          "sources": [
+            "candles_15m"
+          ]
+        },
+        {
+          "key": "volatility",
+          "label": "Volatility Suitability",
+          "points": 9.75,
+          "max_points": 10.0,
+          "available": true,
+          "rating": "EXCELLENT",
+          "summary": "Suitable volatility for intraday means enough movement without extremes (a daily ATR between 1.0% and 2.5% scores highest).",
+          "evidence": [
+            {
+              "label": "Daily ATR",
+              "value": "2.62% of price",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "Today's range vs average daily range",
+              "value": "1.04x",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "Historical volatility (20d, annualised)",
+              "value": "36.5%",
+              "passed": null,
+              "source_key": "candles_15m"
+            }
+          ],
+          "metrics": {
+            "atr_pct": 2.62484378194523
+          },
+          "sources": [
+            "candles_15m"
+          ]
+        },
+        {
+          "key": "technical_setup",
+          "label": "Technical Setup",
+          "points": 10.0,
+          "max_points": 10.0,
+          "available": true,
+          "rating": "EXCELLENT",
+          "summary": "Agreement of trend, EMA stack and Supertrend across timeframes.",
+          "evidence": [
+            {
+              "label": "15m trend / EMA stack",
+              "value": "up / bullish",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "30m trend / EMA stack",
+              "value": "up / bullish",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "1h trend / EMA stack",
+              "value": "up / bullish",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "daily trend / EMA stack",
+              "value": "up / bullish",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "Supertrend agrees (15m, daily)",
+              "value": "2 of 2",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "Breakout in the trade direction",
+              "value": "yes",
+              "passed": true,
+              "source_key": "candles_15m"
+            }
+          ],
+          "metrics": {
+            "alignment": 1.0
+          },
+          "sources": [
+            "candles_15m"
+          ]
+        },
+        {
+          "key": "news_catalyst",
+          "label": "News / Catalyst",
+          "points": 0.0,
+          "max_points": 10.0,
+          "available": false,
+          "rating": "UNAVAILABLE",
+          "summary": "News and catalysts were not assessed: no news source is connected yet.",
+          "evidence": [
+            {
+              "label": "News / corporate announcements",
+              "value": "not assessed",
+              "passed": null,
+              "source_key": null
+            }
+          ],
+          "metrics": {},
+          "sources": []
+        },
+        {
+          "key": "historical_setup",
+          "label": "Historical Setup Quality",
+          "points": 2.03,
+          "max_points": 5.0,
+          "available": true,
+          "rating": "FAIR",
+          "summary": "VWAP side at this time of day: above vwap: 51 past occurrences.",
+          "evidence": [
+            {
+              "label": "Sample size",
+              "value": "51 occurrences (2026-04-27 to 2026-09-18)",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "Historical success rate (1h)",
+              "value": "56.9%",
+              "passed": true,
+              "source_key": "candles_15m"
+            },
+            {
+              "label": "Average return after trading costs",
+              "value": "-0.024%",
+              "passed": false,
+              "source_key": "candles_15m"
+            }
+          ],
+          "metrics": {
+            "occurrences": 51,
+            "success_rate": 56.9,
+            "avg_return_net_pct": -0.024
+          },
+          "sources": [
+            "candles_15m"
+          ]
+        },
+        {
+          "key": "risk",
+          "label": "Risk",
+          "points": 4.0,
+          "max_points": 5.0,
+          "available": true,
+          "rating": "EXCELLENT",
+          "summary": "1 risk flag(s) reduce this component; unchecked risks are listed separately.",
+          "evidence": [
+            {
+              "label": "Prices and volumes are synthetic test data, not the real market",
+              "value": "warning",
+              "passed": false,
+              "source_key": null
+            },
+            {
+              "label": "Not checked: Circuit limits and price bands",
+              "value": "no data source",
+              "passed": null,
+              "source_key": null
+            },
+            {
+              "label": "Not checked: ASM / GSM surveillance status",
+              "value": "no data source",
+              "passed": null,
+              "source_key": null
+            },
+            {
+              "label": "Not checked: Earnings and corporate-event proximity",
+              "value": "no data source",
+              "passed": null,
+              "source_key": null
+            },
+            {
+              "label": "Not checked: Regulatory actions and trading restrictions",
+              "value": "no data source",
+              "passed": null,
+              "source_key": null
+            },
+            {
+              "label": "Not checked: Bid/ask spread (not provided by this data source)",
+              "value": "no data source",
+              "passed": null,
+              "source_key": null
+            }
+          ],
+          "metrics": {
+            "flags": [
+              "SYNTHETIC_DATA"
+            ]
+          },
+          "sources": []
+        }
+      ],
+      "weight_set_id": "61930e33-ef7e-4f4f-9f79-ebb2d8de791d",
+      "weight_set_version": 1,
+      "setup_quality": "STRONG",
+      "direction": "BULLISH"
+    },
+    "technical": {
+      "timeframes": [
+        {
+          "timeframe": "5m",
+          "bars": 750,
+          "ema9": 901.1611566291575,
+          "ema20": 900.0400489518623,
+          "ema50": 896.7850113576985,
+          "ema100": 892.2022693818595,
+          "ema200": 887.8145703678721,
+          "sma20": 899.6305000000011,
+          "sma50": 897.48,
+          "sma200": 884.9620000000001,
+          "rsi": 74.14087031345122,
+          "macd": 1.3726959281698328,
+          "macd_signal": 1.2874133199267823,
+          "macd_hist": 0.08528260824305045,
+          "roc": 0.2589032724040097,
+          "adx": 41.82997069158014,
+          "plus_di": 54.30757181268436,
+          "minus_di": 20.336492312857793,
+          "atr": 0.5795611712526608,
+          "bb_upper": 903.1919405793174,
+          "bb_lower": 896.0690594206849,
+          "bb_width_pct": 0.7917562997955796,
+          "supertrend": 900.2516139903346,
+          "supertrend_dir": 1,
+          "volume_ma": 12554.6,
+          "rel_volume": 0.9898363946282637,
+          "trend": "UP",
+          "ema_stack": "BULLISH"
+        },
+        {
+          "timeframe": "15m",
+          "bars": 1000,
+          "ema9": 899.5798525663935,
+          "ema20": 895.8388185639848,
+          "ema50": 889.7412961685287,
+          "ema100": 884.1449342265589,
+          "ema200": 872.7811450672425,
+          "sma20": 896.2950000000003,
+          "sma50": 885.5559999999994,
+          "sma200": 872.3489500000011,
+          "rsi": 75.55072552522587,
+          "macd": 4.562710329254514,
+          "macd_signal": 4.55873993573414,
+          "macd_hist": 0.003970393520374316,
+          "roc": 0.5057143493661931,
+          "adx": 46.83449185100581,
+          "plus_di": 56.45286268602782,
+          "minus_di": 16.64418553034077,
+          "atr": 1.60733757197392,
+          "bb_upper": 904.5607885286284,
+          "bb_lower": 888.0292114713722,
+          "bb_width_pct": 1.8444348185872168,
+          "supertrend": 897.3322909143352,
+          "supertrend_dir": 1,
+          "volume_ma": 37571.85,
+          "rel_volume": 0.9337575871297261,
+          "trend": "UP",
+          "ema_stack": "BULLISH"
+        },
+        {
+          "timeframe": "30m",
+          "bars": 1000,
+          "ema9": 897.3616033529956,
+          "ema20": 891.7457153742034,
+          "ema50": 884.7972838869729,
+          "ema100": 873.6617577206554,
+          "ema200": 861.953168442246,
+          "sma20": 886.9120000000024,
+          "sma50": 887.8780000000002,
+          "sma200": 846.8806000000009,
+          "rsi": 71.30978171039094,
+          "macd": 5.361630292894574,
+          "macd_signal": 3.592255376592759,
+          "macd_hist": 1.7693749163018153,
+          "roc": 1.4424644443195245,
+          "adx": 32.24920592328743,
+          "plus_di": 56.24135016402371,
+          "minus_di": 23.574656428663648,
+          "atr": 2.837535760474087,
+          "bb_upper": 912.3199937027724,
+          "bb_lower": 861.5040062972324,
+          "bb_width_pct": 5.729541082490694,
+          "supertrend": 893.7054283324937,
+          "supertrend_dir": 1,
+          "volume_ma": 72758.15,
+          "rel_volume": 0.48218653168064335,
+          "trend": "UP",
+          "ema_stack": "BULLISH"
+        },
+        {
+          "timeframe": "1h",
+          "bars": 742,
+          "ema9": 893.5210345274386,
+          "ema20": 887.948103706651,
+          "ema50": 875.2947526487698,
+          "ema100": 863.1196357208805,
+          "ema200": 856.0685093320421,
+          "sma20": 885.1564999999997,
+          "sma50": 877.3044,
+          "sma200": 855.8613999999997,
+          "rsi": 66.39311312965029,
+          "macd": 5.987197649032169,
+          "macd_signal": 4.312882769930172,
+          "macd_hist": 1.6743148791019964,
+          "roc": 3.4274054884339433,
+          "adx": 24.851913431222666,
+          "plus_di": 49.55648989886942,
+          "minus_di": 25.896873768238738,
+          "atr": 4.89445950046381,
+          "bb_upper": 905.2697575929408,
+          "bb_lower": 865.0432424070586,
+          "bb_width_pct": 4.544565304088277,
+          "supertrend": 887.5221714867919,
+          "supertrend_dir": 1,
+          "volume_ma": 136578.7,
+          "rel_volume": 0.25687021475530225,
+          "trend": "UP",
+          "ema_stack": "BULLISH"
+        },
+        {
+          "timeframe": "daily",
+          "bars": 106,
+          "ema9": 872.6172576144139,
+          "ema20": 859.8783139254274,
+          "ema50": 853.7091500793238,
+          "ema100": 854.1548420436914,
+          "ema200": null,
+          "sma20": 852.1180000000006,
+          "sma50": 852.4826000000005,
+          "sma200": null,
+          "rsi": 59.54522635791955,
+          "macd": 9.768312021645556,
+          "macd_signal": 2.381039117964646,
+          "macd_hist": 7.387272903680911,
+          "roc": 9.721039959140976,
+          "adx": 14.10048058278756,
+          "plus_di": 39.479592849376544,
+          "minus_di": 27.47683197994864,
+          "atr": 23.68344047573542,
+          "bb_upper": 916.7603503904373,
+          "bb_lower": 787.4756496095639,
+          "bb_width_pct": 15.17215934657798,
+          "supertrend": 823.9791334194308,
+          "supertrend_dir": 1,
+          "volume_ma": 940186.65,
+          "rel_volume": 1.0248231029445056,
+          "trend": "UP",
+          "ema_stack": "BULLISH"
+        }
+      ],
+      "price_action": {
+        "structure": "HIGHER_HIGHS_LOWS",
+        "swing_highs": 12,
+        "swing_lows": 11,
+        "breakout": "UP",
+        "breakout_level": 893.65,
+        "breakout_20d": null,
+        "consolidation": false,
+        "range_expansion": false,
+        "stretched": null,
+        "vwap_event": null,
+        "price_volume": "PRICE_UP_VOLUME_UP",
+        "tags": [
+          "Gap up 2.3%",
+          "Above prior-day / opening-range high"
+        ]
+      },
+      "levels": {
+        "vwap": 895.2541032582884,
+        "vwap_position": "ABOVE",
+        "vwap_distance_pct": 0.7847935816368475,
+        "opening_range_15_high": 893.65,
+        "opening_range_15_low": 891.51,
+        "opening_range_30_high": 893.65,
+        "opening_range_30_low": 891.51,
+        "prev_day_high": 888.45,
+        "prev_day_low": 866.62,
+        "prev_day_close": 871.54,
+        "gap_pct": 2.317736420588856,
+        "gap_direction": "UP",
+        "gap_filled_today": false,
+        "support": [
+          898.625,
+          891.47,
+          884.75
+        ],
+        "resistance": [
+          905.5450000000001,
+          909.635
+        ]
+      },
+      "direction": "BULLISH",
+      "direction_votes": [
+        {
+          "label": "Price vs VWAP",
+          "value": "+1",
+          "passed": true,
+          "source_key": null
+        },
+        {
+          "label": "15-minute trend",
+          "value": "+1",
+          "passed": true,
+          "source_key": null
+        },
+        {
+          "label": "Daily trend",
+          "value": "+1",
+          "passed": true,
+          "source_key": null
+        },
+        {
+          "label": "15-minute MACD histogram",
+          "value": "+1",
+          "passed": true,
+          "source_key": null
+        },
+        {
+          "label": "Day change",
+          "value": "+1",
+          "passed": true,
+          "source_key": null
+        }
+      ],
+      "provenance": {
+        "source": "simulated",
+        "source_type": "SIMULATED",
+        "data_as_of": "2026-09-21T10:00:00Z",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "confidence": 0.1,
+        "stale": false,
+        "note": "Latest complete bar ended 664 minutes before the analysis time"
+      }
+    },
+    "historical": {
+      "sessions_analyzed": 105,
+      "period_start": "2026-04-27",
+      "period_end": "2026-09-18",
+      "current_setup_key": "GAP_UP|ABOVE_VWAP|NORMAL_RVOL",
+      "current_setup_label": "Gap Up, normal rvol, above vwap",
+      "matched": {
+        "key": "SETUP_VWAP",
+        "label": "VWAP side at this time of day: above vwap",
+        "description": "Days that looked like this after 315 minutes of trading; outcome measured after the same time of day.",
+        "horizon": "1h",
+        "occurrences": 51,
+        "successful": 29,
+        "success_rate": 56.9,
+        "avg_return_pct": 0.076,
+        "median_return_pct": 0.09,
+        "avg_return_net_pct": -0.024,
+        "mfe_pct": 0.274,
+        "mae_pct": -0.163,
+        "horizon_returns_pct": {
+          "15m": 0.039,
+          "30m": 0.06,
+          "1h": 0.076
+        },
+        "reach_probability": {
+          "0.3": 43.1,
+          "0.5": 19.6,
+          "1.0": 0.0
+        },
+        "sample_adequate": true,
+        "min_sample": 30,
+        "period_start": "2026-04-27",
+        "period_end": "2026-09-18",
+        "note": "Direction assumed long (price above VWAP)."
+      },
+      "setups": [
+        {
+          "key": "SETUP_EXACT",
+          "label": "Same setup: Gap Up, normal rvol, above vwap",
+          "description": "Days that looked like this after 315 minutes of trading; outcome measured after the same time of day.",
+          "horizon": "1h",
+          "occurrences": 26,
+          "successful": null,
+          "success_rate": null,
+          "avg_return_pct": null,
+          "median_return_pct": null,
+          "avg_return_net_pct": null,
+          "mfe_pct": null,
+          "mae_pct": null,
+          "horizon_returns_pct": {},
+          "reach_probability": {},
+          "sample_adequate": false,
+          "min_sample": 30,
+          "period_start": "2026-04-27",
+          "period_end": "2026-09-18",
+          "note": "Direction assumed long (price above VWAP). Only 26 occurrences; at least 30 are needed before any statistic is shown."
+        },
+        {
+          "key": "SETUP_GAP_VWAP",
+          "label": "Gap and VWAP side: gap up, above vwap",
+          "description": "Days that looked like this after 315 minutes of trading; outcome measured after the same time of day.",
+          "horizon": "1h",
+          "occurrences": 26,
+          "successful": null,
+          "success_rate": null,
+          "avg_return_pct": null,
+          "median_return_pct": null,
+          "avg_return_net_pct": null,
+          "mfe_pct": null,
+          "mae_pct": null,
+          "horizon_returns_pct": {},
+          "reach_probability": {},
+          "sample_adequate": false,
+          "min_sample": 30,
+          "period_start": "2026-04-27",
+          "period_end": "2026-09-18",
+          "note": "Direction assumed long (price above VWAP). Only 26 occurrences; at least 30 are needed before any statistic is shown."
+        },
+        {
+          "key": "SETUP_VWAP",
+          "label": "VWAP side at this time of day: above vwap",
+          "description": "Days that looked like this after 315 minutes of trading; outcome measured after the same time of day.",
+          "horizon": "1h",
+          "occurrences": 51,
+          "successful": 29,
+          "success_rate": 56.9,
+          "avg_return_pct": 0.076,
+          "median_return_pct": 0.09,
+          "avg_return_net_pct": -0.024,
+          "mfe_pct": 0.274,
+          "mae_pct": -0.163,
+          "horizon_returns_pct": {
+            "15m": 0.039,
+            "30m": 0.06,
+            "1h": 0.076
+          },
+          "reach_probability": {
+            "0.3": 43.1,
+            "0.5": 19.6,
+            "1.0": 0.0
+          },
+          "sample_adequate": true,
+          "min_sample": 30,
+          "period_start": "2026-04-27",
+          "period_end": "2026-09-18",
+          "note": "Direction assumed long (price above VWAP)."
+        },
+        {
+          "key": "VWAP_CROSS_UP",
+          "label": "Cross above VWAP",
+          "description": "A close crossing VWAP, measured over the next hour.",
+          "horizon": "1h",
+          "occurrences": 122,
+          "successful": 84,
+          "success_rate": 68.9,
+          "avg_return_pct": 0.205,
+          "median_return_pct": 0.184,
+          "avg_return_net_pct": 0.105,
+          "mfe_pct": 0.335,
+          "mae_pct": -0.134,
+          "horizon_returns_pct": {
+            "15m": 0.086,
+            "30m": 0.077,
+            "1h": 0.205
+          },
+          "reach_probability": {
+            "0.3": 48.4,
+            "0.5": 29.5,
+            "1.0": 0.0
+          },
+          "sample_adequate": true,
+          "min_sample": 30,
+          "period_start": "2026-04-27",
+          "period_end": "2026-09-18",
+          "note": "Price closed back on the other side of VWAP within an hour in 41% of cases."
+        },
+        {
+          "key": "VWAP_CROSS_DOWN",
+          "label": "Cross below VWAP",
+          "description": "A close crossing VWAP, measured over the next hour.",
+          "horizon": "1h",
+          "occurrences": 124,
+          "successful": 85,
+          "success_rate": 68.5,
+          "avg_return_pct": 0.172,
+          "median_return_pct": 0.183,
+          "avg_return_net_pct": 0.072,
+          "mfe_pct": 0.323,
+          "mae_pct": -0.149,
+          "horizon_returns_pct": {
+            "15m": 0.076,
+            "30m": 0.067,
+            "1h": 0.172
+          },
+          "reach_probability": {
+            "0.3": 49.2,
+            "0.5": 28.2,
+            "1.0": 0.0
+          },
+          "sample_adequate": true,
+          "min_sample": 30,
+          "period_start": "2026-04-27",
+          "period_end": "2026-09-18",
+          "note": "Price closed back on the other side of VWAP within an hour in 40% of cases."
+        },
+        {
+          "key": "ORB_UP",
+          "label": "Opening-range breakout up",
+          "description": "First close beyond the 09:15 to 09:45 range, measured over the next hour.",
+          "horizon": "1h",
+          "occurrences": 88,
+          "successful": 60,
+          "success_rate": 68.2,
+          "avg_return_pct": 0.164,
+          "median_return_pct": 0.193,
+          "avg_return_net_pct": 0.064,
+          "mfe_pct": 0.331,
+          "mae_pct": -0.136,
+          "horizon_returns_pct": {
+            "15m": 0.067,
+            "30m": 0.101,
+            "1h": 0.164
+          },
+          "reach_probability": {
+            "0.3": 53.4,
+            "0.5": 29.5,
+            "1.0": 1.1
+          },
+          "sample_adequate": true,
+          "min_sample": 30,
+          "period_start": "2026-04-27",
+          "period_end": "2026-09-18",
+          "note": null
+        },
+        {
+          "key": "ORB_DOWN",
+          "label": "Opening-range breakout down",
+          "description": "First close beyond the 09:15 to 09:45 range, measured over the next hour.",
+          "horizon": "1h",
+          "occurrences": 83,
+          "successful": 56,
+          "success_rate": 67.5,
+          "avg_return_pct": 0.187,
+          "median_return_pct": 0.229,
+          "avg_return_net_pct": 0.087,
+          "mfe_pct": 0.335,
+          "mae_pct": -0.123,
+          "horizon_returns_pct": {
+            "15m": 0.083,
+            "30m": 0.093,
+            "1h": 0.187
+          },
+          "reach_probability": {
+            "0.3": 53.0,
+            "0.5": 26.5,
+            "1.0": 0.0
+          },
+          "sample_adequate": true,
+          "min_sample": 30,
+          "period_start": "2026-04-27",
+          "period_end": "2026-09-18",
+          "note": null
+        },
+        {
+          "key": "GAP_UP_FILL",
+          "label": "Gap up fill",
+          "description": "Share of gap days on which price returned to the previous close within the session.",
+          "horizon": "session",
+          "occurrences": 50,
+          "successful": 15,
+          "success_rate": 30.0,
+          "avg_return_pct": -0.01,
+          "median_return_pct": -0.083,
+          "avg_return_net_pct": -0.11,
+          "mfe_pct": null,
+          "mae_pct": null,
+          "horizon_returns_pct": {},
+          "reach_probability": {},
+          "sample_adequate": true,
+          "min_sample": 30,
+          "period_start": "2026-04-27",
+          "period_end": "2026-09-18",
+          "note": "Return shown is open to close in the direction of the gap; 46% of gaps continued to the close."
+        },
+        {
+          "key": "GAP_DOWN_FILL",
+          "label": "Gap down fill",
+          "description": "Share of gap days on which price returned to the previous close within the session.",
+          "horizon": "session",
+          "occurrences": 44,
+          "successful": 8,
+          "success_rate": 18.2,
+          "avg_return_pct": 0.016,
+          "median_return_pct": 0.067,
+          "avg_return_net_pct": -0.084,
+          "mfe_pct": null,
+          "mae_pct": null,
+          "horizon_returns_pct": {},
+          "reach_probability": {},
+          "sample_adequate": true,
+          "min_sample": 30,
+          "period_start": "2026-04-27",
+          "period_end": "2026-09-18",
+          "note": "Return shown is open to close in the direction of the gap; 50% of gaps continued to the close."
+        },
+        {
+          "key": "BREAKOUT_20D_UP",
+          "label": "20-day high breakout",
+          "description": "Daily close above the prior 20-day high, measured to the next session's close.",
+          "horizon": "next session",
+          "occurrences": 1,
+          "successful": null,
+          "success_rate": null,
+          "avg_return_pct": null,
+          "median_return_pct": null,
+          "avg_return_net_pct": null,
+          "mfe_pct": null,
+          "mae_pct": null,
+          "horizon_returns_pct": {},
+          "reach_probability": {},
+          "sample_adequate": false,
+          "min_sample": 30,
+          "period_start": "2026-04-27",
+          "period_end": "2026-09-18",
+          "note": "Horizon is the next session, not one hour. Only 1 occurrences; at least 30 are needed before any statistic is shown."
+        },
+        {
+          "key": "BREAKOUT_20D_DOWN",
+          "label": "20-day low breakdown",
+          "description": "Daily close below the prior 20-day low, measured to the next session's close.",
+          "horizon": "next session",
+          "occurrences": 3,
+          "successful": null,
+          "success_rate": null,
+          "avg_return_pct": null,
+          "median_return_pct": null,
+          "avg_return_net_pct": null,
+          "mfe_pct": null,
+          "mae_pct": null,
+          "horizon_returns_pct": {},
+          "reach_probability": {},
+          "sample_adequate": false,
+          "min_sample": 30,
+          "period_start": "2026-04-27",
+          "period_end": "2026-09-18",
+          "note": "Horizon is the next session, not one hour. Only 3 occurrences; at least 30 are needed before any statistic is shown."
+        }
+      ],
+      "baseline_moves": {
+        "15m": 0.126,
+        "30m": 0.208,
+        "1h": 0.323
+      },
+      "estimated_round_trip_cost_pct": 0.1,
+      "warnings": [
+        "Setup evaluated as of 14:30 IST: the last point in the session where a one-hour outcome can still be measured.",
+        "4 of 11 setup statistics have too few occurrences and are shown without rates."
+      ],
+      "provenance": {
+        "source": "simulated",
+        "source_type": "SIMULATED",
+        "data_as_of": "2026-09-21T10:00:00Z",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "confidence": 0.1,
+        "stale": false,
+        "note": "Latest complete bar ended 664 minutes before the analysis time"
+      }
+    },
+    "risk": {
+      "flags": [
+        {
+          "code": "SYNTHETIC_DATA",
+          "severity": "WARNING",
+          "message": "Prices and volumes are synthetic test data, not the real market",
+          "metric": null,
+          "value": null
+        }
+      ],
+      "liquidity_risk": "LOW",
+      "volatility_risk": "MEDIUM",
+      "event_risk": "UNKNOWN",
+      "corporate_risk": "UNKNOWN",
+      "data_risk": "HIGH",
+      "market_risk": "LOW",
+      "overall": "MEDIUM",
+      "unavailable_checks": [
+        "Circuit limits and price bands",
+        "ASM / GSM surveillance status",
+        "Earnings and corporate-event proximity",
+        "Regulatory actions and trading restrictions",
+        "Bid/ask spread (not provided by this data source)"
+      ],
+      "provenance": {
+        "source": "simulated",
+        "source_type": "SIMULATED",
+        "data_as_of": "2026-09-21T10:00:00Z",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "confidence": 0.1,
+        "stale": false,
+        "note": "Latest complete bar ended 664 minutes before the analysis time"
+      }
+    },
+    "verification": {
+      "claims": [
+        {
+          "key": "price",
+          "claim": "Current price",
+          "status": "PARTIALLY_VERIFIED",
+          "confidence": 0.06,
+          "sources_checked": 2,
+          "independent_origins": 1,
+          "values": [
+            {
+              "source": "15-minute candles",
+              "origin": "simulated",
+              "value": 902.28,
+              "data_as_of": "2026-09-21T10:00:00Z",
+              "reliability": 0.1
+            },
+            {
+              "source": "5-minute candles",
+              "origin": "simulated",
+              "value": 902.28,
+              "data_as_of": "2026-09-21T10:00:00Z",
+              "reliability": 0.1
+            }
+          ],
+          "tolerance_pct": 0.5,
+          "detail": "2 feeds agree within 0.00%, but they come from a single provider, so this shows internal consistency, not independent confirmation.",
+          "resolution": null
+        },
+        {
+          "key": "session_volume",
+          "claim": "Session volume so far",
+          "status": "UNVERIFIED",
+          "confidence": 0.05,
+          "sources_checked": 1,
+          "independent_origins": 1,
+          "values": [],
+          "tolerance_pct": null,
+          "detail": "Synthetic feed: volumes at different timeframes are generated independently, so they cannot be compared.",
+          "resolution": null
+        },
+        {
+          "key": "data_integrity",
+          "claim": "Price bars are internally consistent",
+          "status": "PARTIALLY_VERIFIED",
+          "confidence": 0.06,
+          "sources_checked": 1,
+          "independent_origins": 1,
+          "values": [
+            {
+              "source": "stored candles",
+              "origin": "simulated",
+              "value": true,
+              "data_as_of": null,
+              "reliability": 0.1
+            }
+          ],
+          "tolerance_pct": null,
+          "detail": "2,500 bars passed structural checks (OHLC order, positive prices, no duplicates, no recent gaps). This is a consistency check on one source.",
+          "resolution": null
+        }
+      ],
+      "conflicts_found": 0,
+      "sources_checked": 4,
+      "data_confidence": 30.0,
+      "breakdown": {
+        "source_reliability": 0.1,
+        "freshness": 1.0,
+        "verification": 0.6,
+        "completeness": 0.9,
+        "sample_adequacy": 1.0,
+        "synthetic_cap_applied": true
+      },
+      "provenance": {
+        "source": "simulated",
+        "source_type": "SIMULATED",
+        "data_as_of": "2026-09-21T10:00:00Z",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "confidence": 0.1,
+        "stale": false,
+        "note": "Latest complete bar ended 664 minutes before the analysis time"
+      }
+    },
+    "market_context": {
+      "as_of": "2026-09-21T21:04:03.494928Z",
+      "market_state": "PRE_MARKET",
+      "market_state_note": "The market has not opened yet. Analysis uses the last regular session (2026-09-21) and is not live.",
+      "indices": [
+        {
+          "symbol": "NIFTY",
+          "name": "NIFTY 50",
+          "available": true,
+          "price": 25280.12,
+          "change_pct": -2.6497023282322285,
+          "ema20": 24608.843871252404,
+          "ema50": 24527.735555309737,
+          "trend": "UP",
+          "rsi": 55.71600253160795,
+          "ret_5d_pct": 2.185126394882997
+        },
+        {
+          "symbol": "BANKNIFTY",
+          "name": "BANK NIFTY",
+          "available": true,
+          "price": 53465.73,
+          "change_pct": -0.7925907837918356,
+          "ema20": 52512.923608229925,
+          "ema50": 52774.649984546435,
+          "trend": "SIDEWAYS",
+          "rsi": 53.19028644625121,
+          "ret_5d_pct": 2.6311137046610034
+        }
+      ],
+      "india_vix": 13.24,
+      "india_vix_change_pct": -3.428154631655733,
+      "breadth": {
+        "advances": 4,
+        "declines": 4,
+        "unchanged": 0,
+        "universe_size": 8,
+        "pct_above_vwap": 62.5,
+        "pct_above_ema20": 37.5,
+        "note": "Computed over the scanned universe, not the whole exchange."
+      },
+      "regime": {
+        "label": "BULLISH",
+        "volatility": "NORMAL",
+        "confidence": 0.5,
+        "score": 0.33,
+        "factors": [
+          {
+            "name": "NIFTY vs 20-day EMA",
+            "value": "25,280 vs 24,609",
+            "bullish": true,
+            "detail": "Above the 20-day EMA is bullish"
+          },
+          {
+            "name": "NIFTY vs 50-day EMA",
+            "value": "25,280 vs 24,528",
+            "bullish": true,
+            "detail": "Above the 50-day EMA is bullish"
+          },
+          {
+            "name": "NIFTY 20-day EMA vs 50-day EMA",
+            "value": "24,609 vs 24,528",
+            "bullish": true,
+            "detail": "Fast average above slow is bullish"
+          },
+          {
+            "name": "NIFTY day change",
+            "value": "-2.65%",
+            "bullish": false,
+            "detail": "Beyond +/-0.3% counts"
+          },
+          {
+            "name": "BANK NIFTY vs 20-day EMA",
+            "value": "53,466 vs 52,513",
+            "bullish": true,
+            "detail": "Banks lead the index"
+          },
+          {
+            "name": "Advance / decline (scanned universe)",
+            "value": "4 up, 4 down",
+            "bullish": null,
+            "detail": "Above 60% advancing is bullish, below 40% bearish"
+          },
+          {
+            "name": "Stocks above 20-day EMA (scanned universe)",
+            "value": "38%",
+            "bullish": false,
+            "detail": "Above 60% is bullish, below 40% bearish"
+          },
+          {
+            "name": "India VIX",
+            "value": "13.2",
+            "bullish": null,
+            "detail": "High at 20 or above, low at 12 or below"
+          }
+        ]
+      },
+      "sectors": [
+        {
+          "sector": "Energy",
+          "constituents": 1,
+          "ret_1d_pct": 3.7532479356786386,
+          "ret_5d_pct": 5.805889453122215,
+          "rel_strength_1d": 6.402950263910867,
+          "rel_strength_5d": 3.620763058239218,
+          "avg_rel_volume": 0.9428855333798992,
+          "breadth_pct": 100.0,
+          "momentum": 59.599540052154964,
+          "trend": "UP",
+          "rank": 1
+        },
+        {
+          "sector": "FMCG",
+          "constituents": 1,
+          "ret_1d_pct": 3.53325950915504,
+          "ret_5d_pct": 0.7114406673513818,
+          "rel_strength_1d": 6.182961837387269,
+          "rel_strength_5d": -1.473685727531615,
+          "avg_rel_volume": 1.092943326385004,
+          "breadth_pct": 100.0,
+          "momentum": 46.49045231588785,
+          "trend": "SIDEWAYS",
+          "rank": 2
+        },
+        {
+          "sector": "Banking",
+          "constituents": 3,
+          "ret_1d_pct": -1.675838642662205,
+          "ret_5d_pct": -0.0008130861662107117,
+          "rel_strength_1d": 0.9738636855700236,
+          "rel_strength_5d": -2.1859394810492074,
+          "avg_rel_volume": 0.9986786864828568,
+          "breadth_pct": 33.33333333333333,
+          "momentum": 51.63553993581228,
+          "trend": "DOWN",
+          "rank": 3
+        },
+        {
+          "sector": "IT",
+          "constituents": 2,
+          "ret_1d_pct": -1.372772111104481,
+          "ret_5d_pct": -5.182825271403862,
+          "rel_strength_1d": 1.2769302171277475,
+          "rel_strength_5d": -7.367951666286859,
+          "avg_rel_volume": 0.9800583972761623,
+          "breadth_pct": 50.0,
+          "momentum": 43.609382631409176,
+          "trend": "SIDEWAYS",
+          "rank": 4
+        },
+        {
+          "sector": "Capital Goods",
+          "constituents": 1,
+          "ret_1d_pct": -2.8133215244682486,
+          "ret_5d_pct": -4.207393284022598,
+          "rel_strength_1d": -0.16361919623602006,
+          "rel_strength_5d": -6.392519678905595,
+          "avg_rel_volume": 1.0210434892664968,
+          "breadth_pct": 0.0,
+          "momentum": 41.60005941170802,
+          "trend": "DOWN",
+          "rank": 5
+        }
+      ],
+      "unavailable": [
+        "US overnight and Asian markets",
+        "USD/INR",
+        "Crude oil, gold and bond yields",
+        "Exchange-wide advance/decline (breadth is computed over the scanned universe)"
+      ],
+      "provenance": {
+        "source": "simulated",
+        "source_type": "SIMULATED",
+        "data_as_of": "2026-09-21T10:00:00Z",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "confidence": 0.1,
+        "stale": false,
+        "note": null
+      }
+    },
+    "sector_context": {
+      "sector": "Banking",
+      "constituents": 3,
+      "ret_1d_pct": -1.675838642662205,
+      "ret_5d_pct": -0.0008130861662107117,
+      "rel_strength_1d": 0.9738636855700236,
+      "rel_strength_5d": -2.1859394810492074,
+      "avg_rel_volume": 0.9986786864828568,
+      "breadth_pct": 33.33333333333333,
+      "momentum": 51.63553993581228,
+      "trend": "DOWN",
+      "rank": 3
+    },
+    "why_listed": [
+      "Price Action: Daily swing structure higher highs and higher lows; Price vs VWAP +0.78% (above).",
+      "Liquidity: Average daily traded value (20 sessions) \u20b980.1 crore.",
+      "Technical Setup: 15m trend / EMA stack up / bullish; 30m trend / EMA stack up / bullish.",
+      "Momentum: RSI (15m / daily) 76 / 60; MACD histogram (15m) +0.004.",
+      "Volatility Suitability: Daily ATR 2.62% of price; Today's range vs average daily range 1.04x.",
+      "Market Regime: NIFTY vs 20-day EMA 25,280 vs 24,609; NIFTY vs 50-day EMA 25,280 vs 24,528."
+    ],
+    "risks": [
+      "Prices and volumes are synthetic test data, not the real market.",
+      "Not checked (no data source): circuit limits and price bands; asm / gsm surveillance status; earnings and corporate-event proximity; regulatory actions and trading restrictions."
+    ],
+    "invalidation": [
+      "Price closes back below VWAP (\u20b9895.25).",
+      "Price falls below the opening-range low (\u20b9891.51).",
+      "The nearest support at \u20b9898.62 fails.",
+      "Relative volume fades below 1.0x, so the move loses participation.",
+      "The market regime turns bearish (for example NIFTY closing below its 20-day EMA)."
+    ],
+    "warnings": [
+      {
+        "code": "SYNTHETIC_DATA",
+        "severity": "WARNING",
+        "message": "Prices and volumes are synthetic test data, not the real market",
+        "symbol": "SBIN"
+      },
+      {
+        "code": "MARKET_CLOSED",
+        "severity": "INFO",
+        "message": "The market has not opened yet. Analysis uses the last regular session (2026-09-21) and is not live.",
+        "symbol": "SBIN"
+      },
+      {
+        "code": "PARTIAL_COVERAGE",
+        "severity": "INFO",
+        "message": "The score covers 90% of the scoring weights. Not assessed: News / Catalyst.",
+        "symbol": "SBIN"
+      }
+    ],
+    "sources": [
+      {
+        "key": "candles_15m",
+        "name": "simulated 15-minute candles",
+        "source_type": "SIMULATED",
+        "tier": 3,
+        "reliability": 0.1,
+        "origin": "simulated",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "data_as_of": null,
+        "url": null,
+        "note": "Regular-session bars, stored in MySQL"
+      },
+      {
+        "key": "candles_5m",
+        "name": "simulated 5-minute candles",
+        "source_type": "SIMULATED",
+        "tier": 3,
+        "reliability": 0.1,
+        "origin": "simulated",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "data_as_of": null,
+        "url": null,
+        "note": null
+      },
+      {
+        "key": "quote",
+        "name": "simulated live quote",
+        "source_type": "SIMULATED",
+        "tier": 3,
+        "reliability": 0.1,
+        "origin": "simulated",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "data_as_of": null,
+        "url": null,
+        "note": null
+      }
+    ],
+    "agents": [
+      {
+        "agent": "MarketScannerAgent",
+        "label": "Market Scanner",
+        "status": "SKIPPED",
+        "confidence": null,
+        "timestamp": null,
+        "duration_ms": null,
+        "summary": "Not run at this research depth.",
+        "findings": [],
+        "warnings": []
+      },
+      {
+        "agent": "MarketResearchAgent",
+        "label": "Data Research",
+        "status": "NOT_AVAILABLE",
+        "confidence": null,
+        "timestamp": null,
+        "duration_ms": null,
+        "summary": "Company data, announcements and corporate events need a licensed or permitted data source (planned phase 2).",
+        "findings": [],
+        "warnings": []
+      },
+      {
+        "agent": "DataVerificationAgent",
+        "label": "Data Verification",
+        "status": "SUCCESS",
+        "confidence": 0.06,
+        "timestamp": "2026-09-21T21:04:04.886183Z",
+        "duration_ms": 3,
+        "summary": "Current price: partially verified (2 source(s), 1 independent).",
+        "findings": [
+          "Current price: partially verified (2 source(s), 1 independent).",
+          "Session volume so far: unverified (1 source(s), 1 independent).",
+          "Price bars are internally consistent: partially verified (1 source(s), 1 independent)."
+        ],
+        "warnings": []
+      },
+      {
+        "agent": "HistoricalTechnicalAgent",
+        "label": "Historical & Technical Analysis",
+        "status": "SUCCESS",
+        "confidence": 0.1,
+        "timestamp": "2026-09-21T21:04:04.886183Z",
+        "duration_ms": 10,
+        "summary": "Direction bullish (+5 of 5 signals).",
+        "findings": [
+          "Direction bullish (+5 of 5 signals).",
+          "Gap up 2.3%",
+          "Above prior-day / opening-range high",
+          "Best-supported historical match: VWAP side at this time of day: above vwap (51 occurrences)."
+        ],
+        "warnings": [
+          "Setup evaluated as of 14:30 IST: the last point in the session where a one-hour outcome can still be measured.",
+          "4 of 11 setup statistics have too few occurrences and are shown without rates."
+        ]
+      },
+      {
+        "agent": "FundamentalResearchAgent",
+        "label": "Fundamental Analysis",
+        "status": "NOT_AVAILABLE",
+        "confidence": null,
+        "timestamp": null,
+        "duration_ms": null,
+        "summary": "Fundamentals need a data vendor subscription (planned phase 3).",
+        "findings": [],
+        "warnings": []
+      },
+      {
+        "agent": "NewsCatalystAgent",
+        "label": "News & Catalyst Analysis",
+        "status": "NOT_AVAILABLE",
+        "confidence": null,
+        "timestamp": null,
+        "duration_ms": null,
+        "summary": "News analysis needs a news source and an LLM key (planned phase 2).",
+        "findings": [],
+        "warnings": []
+      },
+      {
+        "agent": "MarketRiskAgent",
+        "label": "Market & Risk Analysis",
+        "status": "SUCCESS",
+        "confidence": 0.1,
+        "timestamp": "2026-09-21T21:04:04.886183Z",
+        "duration_ms": 0,
+        "summary": "Overall risk medium; 0 flag(s).",
+        "findings": [
+          "Overall risk medium; 0 flag(s)."
+        ],
+        "warnings": [
+          "Not checked: Circuit limits and price bands",
+          "Not checked: ASM / GSM surveillance status",
+          "Not checked: Earnings and corporate-event proximity",
+          "Not checked: Regulatory actions and trading restrictions",
+          "Not checked: Bid/ask spread (not provided by this data source)"
+        ]
+      },
+      {
+        "agent": "QuantScoringAgent",
+        "label": "Quant Scoring",
+        "status": "SUCCESS",
+        "confidence": 0.3,
+        "timestamp": "2026-09-21T21:04:04.886183Z",
+        "duration_ms": 0,
+        "summary": "Research score 82.0 of 100 over 90% of the scoring weights.",
+        "findings": [
+          "Research score 82.0 of 100 over 90% of the scoring weights.",
+          "Market Regime: 6.65/10",
+          "Liquidity: 11.16/15",
+          "Price Action: 13.88/15",
+          "Momentum: 9.86/10",
+          "Volume: 6.43/10",
+          "Volatility Suitability: 9.75/10",
+          "Technical Setup: 10/10",
+          "Historical Setup Quality: 2.03/5",
+          "Risk: 4/5"
+        ],
+        "warnings": []
+      },
+      {
+        "agent": "ResearchSynthesizerAgent",
+        "label": "Research Synthesis",
+        "status": "SUCCESS",
+        "confidence": 0.3,
+        "timestamp": "2026-09-21T21:04:04.886183Z",
+        "duration_ms": 0,
+        "summary": "Assembled the report from 4 agent outputs without adding new facts.",
+        "findings": [
+          "Assembled the report from 4 agent outputs without adding new facts."
+        ],
+        "warnings": []
+      }
+    ],
+    "not_assessed": [
+      "News and catalysts",
+      "Corporate announcements, results calendar and corporate actions",
+      "Fundamentals, valuation and shareholding",
+      "Institutional (FII/DII) activity",
+      "Global markets, currencies and commodities",
+      "Bid/ask spread and market depth",
+      "Circuit limits and price bands",
+      "ASM / GSM surveillance status",
+      "Earnings and corporate-event proximity",
+      "Regulatory actions and trading restrictions"
+    ],
+    "disclaimer": "Research and decision support only. This is not investment advice or a recommendation to buy or sell. Scores describe how a setup measures up against explicit rules on the data available at the time, and have not been shown to predict profit."
+  }
+}

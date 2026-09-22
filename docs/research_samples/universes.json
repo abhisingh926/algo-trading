@@ -1,0 +1,16 @@
+{
+  "success": true,
+  "message": "Research universes",
+  "status": {
+    "code": 200,
+    "description": "Research universes"
+  },
+  "data": [
+    {
+      "name": "NIFTY50",
+      "count": 50,
+      "members": [],
+      "note": "Approximate NIFTY 50 constituents as known when this list was written; verify against NSE."
+    }
+  ]
+}

@@ -42,6 +42,8 @@ INTRADAY_INTERVAL = {Timeframe.M1: "1", Timeframe.M5: "5", Timeframe.M15: "15", 
 
 
 def segment(ref: InstrumentRef) -> str:
+    if ref.segment == "INDEX":
+        return "IDX_I"
     try:
         return EXCHANGE_SEGMENT[ref.exchange.upper()]
     except KeyError as exc:
@@ -147,6 +149,10 @@ def to_funds(raw: dict[str, Any]) -> BrokerFunds:
 def to_quote(ref: InstrumentRef, raw: dict[str, Any], now: datetime) -> Quote:
     ohlc = raw.get("ohlc") or {}
     ltp = float(raw.get("last_price") or 0)
+    depth = raw.get("depth") or {}
+    bids, asks = depth.get("buy") or [], depth.get("sell") or []
+    bid = float(bids[0]["price"]) if bids and bids[0].get("price") else None
+    ask = float(asks[0]["price"]) if asks and asks[0].get("price") else None
     return Quote(
         symbol=ref.symbol,
         exchange=ref.exchange,
@@ -158,6 +164,8 @@ def to_quote(ref: InstrumentRef, raw: dict[str, Any], now: datetime) -> Quote:
         volume=int(raw.get("volume") or 0),
         timestamp=now,
         source="dhan",
+        bid=bid,
+        ask=ask,
     )
 
 

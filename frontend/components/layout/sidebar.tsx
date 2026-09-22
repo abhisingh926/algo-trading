@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CandlestickChart } from "lucide-react";
-import { NAV_ITEMS } from "@/components/layout/nav";
+import { isGroup, NAV_ENTRIES, type NavItem } from "@/components/layout/nav";
 import { cn } from "@/lib/utils";
 
 export function Brand() {
@@ -17,26 +17,65 @@ export function Brand() {
   );
 }
 
+function NavLink({
+  item,
+  active,
+  nested,
+  onNavigate,
+}: {
+  item: NavItem;
+  active: boolean;
+  nested?: boolean;
+  onNavigate?: () => void;
+}) {
+  const Icon = item.icon;
+  return (
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "flex h-9 items-center gap-2.5 rounded-md px-2.5 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+        nested && "h-8 pl-3 text-[13px]",
+        active && "bg-sidebar-accent text-sidebar-accent-foreground",
+      )}
+    >
+      <Icon className={cn("size-4 shrink-0", nested && "size-3.5")} />
+      {item.label}
+    </Link>
+  );
+}
+
+const isActive = (pathname: string, item: NavItem) =>
+  item.match ? item.match(pathname) : pathname === item.href || pathname.startsWith(`${item.href}/`);
+
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   return (
     <nav aria-label="Main" className="flex flex-col gap-0.5">
-      {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-        const active = pathname === href || pathname.startsWith(`${href}/`);
+      {NAV_ENTRIES.map((entry) => {
+        if (!isGroup(entry)) {
+          return (
+            <NavLink key={entry.href} item={entry} active={isActive(pathname, entry)} onNavigate={onNavigate} />
+          );
+        }
+        const GroupIcon = entry.icon;
         return (
-          <Link
-            key={href}
-            href={href}
-            onClick={onNavigate}
-            aria-current={active ? "page" : undefined}
-            className={cn(
-              "flex h-9 items-center gap-2.5 rounded-md px-2.5 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              active && "bg-sidebar-accent text-sidebar-accent-foreground",
-            )}
-          >
-            <Icon className="size-4 shrink-0" />
-            {label}
-          </Link>
+          <div key={entry.label} role="group" aria-label={entry.label} className="mt-1.5 flex flex-col gap-0.5">
+            <p className="flex h-7 items-center gap-2.5 px-2.5 text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+              <GroupIcon className="size-3.5" aria-hidden />
+              {entry.label}
+            </p>
+            {entry.children.map((child) => (
+              <NavLink
+                key={child.href}
+                item={child}
+                nested
+                active={isActive(pathname, child)}
+                onNavigate={onNavigate}
+              />
+            ))}
+          </div>
         );
       })}
     </nav>

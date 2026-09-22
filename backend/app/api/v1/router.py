@@ -9,6 +9,7 @@ from app.api.v1 import (
     market_data,
     orders,
     positions,
+    research,
     risk,
     strategies,
     system,
@@ -32,5 +33,6 @@ for module in (
     backtests,
     risk,
     market_data,
+    research,
 ):
     api_router.include_router(module.router, dependencies=_protected)

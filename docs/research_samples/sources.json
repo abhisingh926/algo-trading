@@ -1,0 +1,150 @@
+{
+  "success": true,
+  "message": "Sources and verification",
+  "status": {
+    "code": 200,
+    "description": "Sources and verification"
+  },
+  "data": {
+    "symbol": "SBIN",
+    "run_id": "0abede4a-8dc7-4669-aaa9-f31fc9cf1613",
+    "sources": [
+      {
+        "key": "candles_15m",
+        "name": "simulated 15-minute candles",
+        "source_type": "SIMULATED",
+        "tier": 3,
+        "reliability": 0.1,
+        "origin": "simulated",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "data_as_of": null,
+        "url": null,
+        "note": "Regular-session bars, stored in MySQL"
+      },
+      {
+        "key": "candles_5m",
+        "name": "simulated 5-minute candles",
+        "source_type": "SIMULATED",
+        "tier": 3,
+        "reliability": 0.1,
+        "origin": "simulated",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "data_as_of": null,
+        "url": null,
+        "note": null
+      },
+      {
+        "key": "quote",
+        "name": "simulated live quote",
+        "source_type": "SIMULATED",
+        "tier": 3,
+        "reliability": 0.1,
+        "origin": "simulated",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "data_as_of": null,
+        "url": null,
+        "note": null
+      }
+    ],
+    "claims": [
+      {
+        "key": "price",
+        "claim": "Current price",
+        "status": "PARTIALLY_VERIFIED",
+        "confidence": 0.06,
+        "sources_checked": 2,
+        "independent_origins": 1,
+        "values": [
+          {
+            "source": "15-minute candles",
+            "origin": "simulated",
+            "value": 902.28,
+            "data_as_of": "2026-09-21T10:00:00Z",
+            "reliability": 0.1
+          },
+          {
+            "source": "5-minute candles",
+            "origin": "simulated",
+            "value": 902.28,
+            "data_as_of": "2026-09-21T10:00:00Z",
+            "reliability": 0.1
+          }
+        ],
+        "tolerance_pct": 0.5,
+        "detail": "2 feeds agree within 0.00%, but they come from a single provider, so this shows internal consistency, not independent confirmation.",
+        "resolution": null
+      },
+      {
+        "key": "session_volume",
+        "claim": "Session volume so far",
+        "status": "UNVERIFIED",
+        "confidence": 0.05,
+        "sources_checked": 1,
+        "independent_origins": 1,
+        "values": [],
+        "tolerance_pct": null,
+        "detail": "Synthetic feed: volumes at different timeframes are generated independently, so they cannot be compared.",
+        "resolution": null
+      },
+      {
+        "key": "data_integrity",
+        "claim": "Price bars are internally consistent",
+        "status": "PARTIALLY_VERIFIED",
+        "confidence": 0.06,
+        "sources_checked": 1,
+        "independent_origins": 1,
+        "values": [
+          {
+            "source": "stored candles",
+            "origin": "simulated",
+            "value": true,
+            "data_as_of": null,
+            "reliability": 0.1
+          }
+        ],
+        "tolerance_pct": null,
+        "detail": "2,500 bars passed structural checks (OHLC order, positive prices, no duplicates, no recent gaps). This is a consistency check on one source.",
+        "resolution": null
+      }
+    ],
+    "data_confidence": 30.0,
+    "provenance": [
+      {
+        "source": "simulated",
+        "source_type": "SIMULATED",
+        "data_as_of": "2026-09-21T10:00:00Z",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "confidence": 0.1,
+        "stale": false,
+        "note": "Latest complete bar ended 664 minutes before the analysis time"
+      },
+      {
+        "source": "simulated",
+        "source_type": "SIMULATED",
+        "data_as_of": "2026-09-21T10:00:00Z",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "confidence": 0.1,
+        "stale": false,
+        "note": "Latest complete bar ended 664 minutes before the analysis time"
+      },
+      {
+        "source": "simulated",
+        "source_type": "SIMULATED",
+        "data_as_of": "2026-09-21T10:00:00Z",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "confidence": 0.1,
+        "stale": false,
+        "note": "Latest complete bar ended 664 minutes before the analysis time"
+      },
+      {
+        "source": "simulated",
+        "source_type": "SIMULATED",
+        "data_as_of": "2026-09-21T10:00:00Z",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "confidence": 0.1,
+        "stale": false,
+        "note": null
+      }
+    ]
+  }
+}

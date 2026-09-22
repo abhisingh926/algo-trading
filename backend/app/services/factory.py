@@ -15,6 +15,20 @@ from app.repositories.market_data_repository import MarketDataRepository
 from app.repositories.order_repository import OrderRepository
 from app.repositories.pnl_repository import PnlRepository
 from app.repositories.position_repository import PositionRepository
+from app.repositories.research_repository import (
+    ResearchAgentRunRepository,
+    ResearchCandidateRepository,
+    ResearchClaimRepository,
+    ResearchOutputRepository,
+    ResearchPatternRepository,
+    ResearchRiskEventRepository,
+    ResearchRunRepository,
+    ResearchScoreRepository,
+    ResearchSnapshotRepository,
+    ResearchSourceRepository,
+    ResearchUniverseRepository,
+    ResearchWeightRepository,
+)
 from app.repositories.risk_repository import RiskRepository
 from app.repositories.signal_repository import SignalRepository
 from app.repositories.strategy_repository import StrategyRepository
@@ -29,6 +43,8 @@ from app.services.market_data_service import MarketDataService
 from app.services.order_service import OrderService
 from app.services.pnl_service import PnlService
 from app.services.position_service import PositionService
+from app.services.research_service import ResearchService
+from app.services.research_store import ResearchStore
 from app.services.risk_service import RiskService
 from app.services.signal_service import SignalService
 from app.services.strategy_service import StrategyService
@@ -229,6 +245,35 @@ class Services:
     def backtests(self) -> BacktestService:
         return BacktestService(
             self.backtest_repo, self.strategy_repo, self.market_data, self.events, self.settings
+        )
+
+    @cached_property
+    def research_store(self) -> ResearchStore:
+        s = self.session
+        return ResearchStore(
+            ResearchRunRepository(s),
+            ResearchAgentRunRepository(s),
+            ResearchCandidateRepository(s),
+            ResearchScoreRepository(s),
+            ResearchOutputRepository(s),
+            ResearchClaimRepository(s),
+            ResearchSnapshotRepository(s),
+            ResearchPatternRepository(s),
+            ResearchRiskEventRepository(s),
+            ResearchWeightRepository(s),
+            ResearchUniverseRepository(s),
+            ResearchSourceRepository(s),
+            self.instrument_repo,
+            self.container.market_data.name,
+        )
+
+    @cached_property
+    def research(self) -> ResearchService:
+        return ResearchService(
+            self.research_store,
+            self.settings,
+            self.container.market_data.name,
+            self.container.research_runner.submit,
         )
 
     @cached_property

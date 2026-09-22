@@ -84,6 +84,13 @@ class BrokerNotConfiguredError(BrokerError):
     message = "Broker is not configured"
 
 
+class NotAvailableYetError(AppError):
+    """A documented feature whose data source is not connected yet (for example news)."""
+
+    status_code = 501
+    message = "Not available yet"
+
+
 class MarketDataError(AppError):
     status_code = 502
     message = "Market data unavailable"

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from collections.abc import Sequence
 from datetime import date, datetime, timedelta
 
@@ -11,9 +12,16 @@ from app.market_data.base import MarketDataProvider
 from app.models.instrument import Instrument
 from app.repositories.instrument_repository import InstrumentRepository
 from app.repositories.market_data_repository import MarketDataRepository
+from app.research.reference.nifty50 import INDICES, NIFTY50
+from app.research.sessions import filter_session
 from app.utils.time import ist_day_end_utc, ist_day_start_utc, utcnow
 
 _COVERAGE_TOLERANCE = timedelta(days=4)  # weekends + exchange holidays
+_HEAD_TOLERANCE = timedelta(days=7)
+_ATTEMPT_TTL_SECONDS = 300
+# (instrument key, timeframe, "head" | "tail") -> monotonic time of the last fetch attempt. Stops a run from
+# re-requesting a range the provider has already answered (for example a weekend with no new bars).
+_FETCH_ATTEMPTS: dict[tuple[str, str, str], float] = {}
 
 # NSE large caps with their exchange tokens (Dhan securityId == NSE token).
 DEFAULT_INSTRUMENTS: tuple[tuple[str, str, str], ...] = (
@@ -56,6 +64,28 @@ class MarketDataService:
                     Instrument(symbol=symbol, exchange="NSE", name=name, exchange_token=token)
                 )
                 created += 1
+        for symbol, name, token, tick, _sector in NIFTY50:
+            existing = await self.instruments.get_by_symbol(symbol, "NSE")
+            if existing is None:
+                await self.instruments.create(
+                    Instrument(symbol=symbol, exchange="NSE", name=name, exchange_token=token, tick_size=tick)
+                )
+                created += 1
+            elif not existing.exchange_token:
+                existing.exchange_token = token
+        for symbol, name, token in INDICES:
+            if await self.instruments.get_by_symbol(symbol, "NSE") is None:
+                await self.instruments.create(
+                    Instrument(
+                        symbol=symbol,
+                        exchange="NSE",
+                        name=name,
+                        exchange_token=token,
+                        segment="INDEX",
+                        tick_size=0.05,
+                    )
+                )
+                created += 1
         return created
 
     async def search_instruments(self, query: str, limit: int) -> Sequence[Instrument]:
@@ -76,7 +106,9 @@ class MarketDataService:
 
     async def resolve(self, symbol: str, exchange: str = "NSE") -> InstrumentRef:
         instrument = await self.get_instrument(symbol, exchange)
-        return InstrumentRef(instrument.symbol, instrument.exchange, instrument.exchange_token)
+        return InstrumentRef(
+            instrument.symbol, instrument.exchange, instrument.exchange_token, instrument.segment
+        )
 
     # ---- quotes --------------------------------------------------------------------------------
     async def refresh_quotes(self, refs: Sequence[InstrumentRef]) -> list[Quote]:
@@ -123,7 +155,7 @@ class MarketDataService:
         """Historical bars from MySQL, fetching + storing from the provider when coverage is missing."""
         start, end = ist_day_start_utc(start_date), min(ist_day_end_utc(end_date), utcnow())
         count, first, last, source = await self.candles.coverage(
-            ref.symbol, ref.exchange, timeframe, start, end
+            ref.symbol, ref.exchange, timeframe, start, end, self.provider.name
         )
         complete = (
             count > 0
@@ -135,6 +167,50 @@ class MarketDataService:
             await self.sync_historical(ref, timeframe, start_date, end_date)
             source = self.provider.name
         return (
-            await self.candles.get_candles(ref.symbol, ref.exchange, timeframe, start, end),
+            await self.candles.get_candles(
+                ref.symbol, ref.exchange, timeframe, start, end, self.provider.name
+            ),
             source or self.provider.name,
+        )
+
+    # ---- research candle loading (split so network fetches can run concurrently) -------------------
+    async def plan_candle_fetch(
+        self, ref: InstrumentRef, timeframe: Timeframe, start: datetime, end: datetime
+    ) -> list[tuple[datetime, datetime]]:
+        """Ranges missing from the store for this provider. Reads the database only."""
+        count, first, last, _ = await self.candles.coverage(
+            ref.symbol, ref.exchange, timeframe, start, end, self.provider.name
+        )
+        step = timedelta(minutes=timeframe.minutes)
+        wanted: list[tuple[str, tuple[datetime, datetime]]] = []
+        if count == 0 or first is None or last is None:
+            wanted.append(("head", (start, end)))
+        else:
+            if first - start > _HEAD_TOLERANCE:
+                wanted.append(("head", (start, first)))
+            if end - last > max(step * 2, timedelta(hours=1)):
+                wanted.append(("tail", (last, end)))
+        now = time.monotonic()
+        ranges = []
+        for kind, window in wanted:
+            key = (ref.key, timeframe.value, kind)
+            if now - _FETCH_ATTEMPTS.get(key, -1e9) >= _ATTEMPT_TTL_SECONDS:
+                _FETCH_ATTEMPTS[key] = now
+                ranges.append(window)
+        return ranges
+
+    async def store_session_candles(
+        self, ref: InstrumentRef, timeframe: Timeframe, candles: list[Candle]
+    ) -> int:
+        """Persist closed regular-session bars only (research ignores everything else)."""
+        now = utcnow()
+        step = timedelta(minutes=timeframe.minutes)
+        keep = [c for c in filter_session(candles) if c.timestamp + step <= now]
+        return await self.candles.save_candles(ref.symbol, ref.exchange, timeframe, keep, self.provider.name)
+
+    async def read_candles(
+        self, ref: InstrumentRef, timeframe: Timeframe, start: datetime, end: datetime
+    ) -> list[Candle]:
+        return await self.candles.get_candles(
+            ref.symbol, ref.exchange, timeframe, start, end, self.provider.name
         )

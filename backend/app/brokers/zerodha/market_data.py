@@ -27,7 +27,13 @@ class ZerodhaMarketData(MarketDataProvider):
         return [mapper.to_quote(ref, raw[ref.key], now) for ref in symbols if ref.key in raw]
 
     async def get_historical_data(
-        self, symbol: InstrumentRef, interval: Timeframe, start: datetime, end: datetime
+        self,
+        symbol: InstrumentRef,
+        interval: Timeframe,
+        start: datetime,
+        end: datetime,
+        *,
+        session_only: bool = False,
     ) -> list[Candle]:
         start, end = ensure_utc(start), ensure_utc(end)
         token, kite_interval = mapper.instrument_token(symbol), mapper.INTERVAL_TO_KITE[interval]

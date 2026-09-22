@@ -43,13 +43,19 @@ class DhanMarketData(MarketDataProvider):
         return quotes
 
     async def get_historical_data(
-        self, symbol: InstrumentRef, interval: Timeframe, start: datetime, end: datetime
+        self,
+        symbol: InstrumentRef,
+        interval: Timeframe,
+        start: datetime,
+        end: datetime,
+        *,
+        session_only: bool = False,
     ) -> list[Candle]:
         start, end = ensure_utc(start), ensure_utc(end)
         base = {
             "securityId": mapper.security_id(symbol),
             "exchangeSegment": mapper.segment(symbol),
-            "instrument": "EQUITY",
+            "instrument": "INDEX" if symbol.segment == "INDEX" else "EQUITY",
         }
         candles: list[Candle] = []
         cursor = start

@@ -305,15 +305,24 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
     a: (
       <>
         <p>
-          Almost always a risk limit or the kill switch. The common ones are: the maximum daily loss, the maximum
-          order value, the maximum position size, too many open positions or trades today, or a losing streak.
+          Almost always a risk limit or the kill switch. The common ones are: the maximum daily loss, the maximum order
+          value, the maximum position size, too many open positions or trades today, or a losing streak.
         </p>
         <p>
-          Open the order on the <Link className="underline underline-offset-4" href="/orders">Orders</Link> page for
-          its status message, then look in <Link className="underline underline-offset-4" href="/events">Logs</Link>{" "}
-          for a <code className="font-mono text-xs">risk_check_failed</code> event with the exact reason. Change a
-          limit on the <Link className="underline underline-offset-4" href="/risk">Risk</Link> page only if you
-          understand why it blocked you.
+          Open the order on the{" "}
+          <Link className="underline underline-offset-4" href="/orders">
+            Orders
+          </Link>{" "}
+          page for its status message, then look in{" "}
+          <Link className="underline underline-offset-4" href="/events">
+            Logs
+          </Link>{" "}
+          for a <code className="font-mono text-xs">risk_check_failed</code> event with the exact reason. Change a limit
+          on the{" "}
+          <Link className="underline underline-offset-4" href="/risk">
+            Risk
+          </Link>{" "}
+          page only if you understand why it blocked you.
         </p>
       </>
     ),
@@ -323,14 +332,14 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
     a: (
       <>
         <p>
-          A strategy only looks at a candle when it closes, and it only raises a signal when its rule actually
-          matches, for example when two averages cross. On a 5-minute timeframe that check happens once every five
-          minutes, and a crossover may take hours or days to appear.
+          A strategy only looks at a candle when it closes, and it only raises a signal when its rule actually matches,
+          for example when two averages cross. On a 5-minute timeframe that check happens once every five minutes, and a
+          crossover may take hours or days to appear.
         </p>
         <p>
-          With real market data nothing happens while the market is closed (NSE trades 9:15 to 15:30 IST on
-          weekdays). Check that the strategy shows RUNNING and look at its &quot;last evaluated&quot; time on the
-          Strategies page. No signals is normal, not a fault.
+          With real market data nothing happens while the market is closed (NSE trades 9:15 to 15:30 IST on weekdays).
+          Check that the strategy shows RUNNING and look at its &quot;last evaluated&quot; time on the Strategies page.
+          No signals is normal, not a fault.
         </p>
       </>
     ),
@@ -339,10 +348,9 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
     q: "What does HALTED mean?",
     a: (
       <p>
-        The kill switch is on. All strategies were stopped, new orders are blocked and pending orders were
-        cancelled. Open positions stay open unless you enabled closing them in the risk settings. To carry on, use
-        &quot;Resume trading&quot; in the red banner. Resuming does not restart strategies: start each one again
-        yourself.
+        The kill switch is on. All strategies were stopped, new orders are blocked and pending orders were cancelled.
+        Open positions stay open unless you enabled closing them in the risk settings. To carry on, use &quot;Resume
+        trading&quot; in the red banner. Resuming does not restart strategies: start each one again yourself.
       </p>
     ),
   },
@@ -359,8 +367,8 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
           command again, so that strangers cannot sign up.
         </p>
         <p>
-          Important: all users currently share the same strategies, orders, positions and data. There are no
-          separate accounts of trades per user, so anyone with a login can see and change everything.
+          Important: all users currently share the same strategies, orders, positions and data. There are no separate
+          accounts of trades per user, so anyone with a login can see and change everything.
         </p>
       </>
     ),
@@ -373,12 +381,12 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
           Paper mode never reaches a real broker: it is a simulation inside the platform. Live trading needs four
           separate switches to be on at the same time, and you can see each one, with its current state, under
           &quot;Live trading guards&quot; on the{" "}
-          <Link className="underline underline-offset-4" href="/brokers">Brokers</Link> page. Broker passwords and
-          keys are never entered or shown in this app.
+          <Link className="underline underline-offset-4" href="/brokers">
+            Brokers
+          </Link>{" "}
+          page. Broker passwords and keys are never entered or shown in this app.
         </p>
-        <p>
-          Safe does not mean profitable. Even in paper mode, results can be better than real trading would be.
-        </p>
+        <p>Safe does not mean profitable. Even in paper mode, results can be better than real trading would be.</p>
       </>
     ),
   },
@@ -386,8 +394,8 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
     q: "If a backtest looks great, will the strategy make money?",
     a: (
       <p>
-        No. A backtest only shows what would have happened in the past, and markets change. Treat it as a way to
-        weed out bad ideas, not as proof a good one will work. Nothing in this platform is investment advice.
+        No. A backtest only shows what would have happened in the past, and markets change. Treat it as a way to weed
+        out bad ideas, not as proof a good one will work. Nothing in this platform is investment advice.
       </p>
     ),
   },
@@ -399,7 +407,10 @@ function Faq() {
       {FAQ.map((item) => (
         <details key={item.q} className="group rounded-lg border bg-card">
           <summary className="flex cursor-pointer list-none items-center gap-2 p-3 text-sm font-medium select-none marker:hidden [&::-webkit-details-marker]:hidden">
-            <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-90" aria-hidden />
+            <ChevronRight
+              className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-90"
+              aria-hidden
+            />
             {item.q}
           </summary>
           <div className="grid gap-2 border-t p-3 pl-9 text-sm text-muted-foreground">{item.a}</div>
@@ -409,10 +420,99 @@ function Faq() {
   );
 }
 
+// ---------- Research ----------
+const RESEARCH_TERMS = [
+  {
+    title: "What the Research Score is",
+    text: "A number from 0 to 100 that says how well a stock's intraday setup measures up against a fixed set of rules: market backdrop, liquidity, price action, momentum, volume, volatility, technical structure, historical behaviour and risk. Each rule earns points and the total is scaled to 100. It describes the setup. It does not predict profit, and it is not a buy or sell signal.",
+  },
+  {
+    title: "Why Data Confidence is a separate number",
+    text: "The score says how the setup looks. Data Confidence says how far the data behind it can be trusted: how reliable the sources are, how fresh the data is, and whether independent sources agree. A high score with low confidence means 'looks good on data we cannot trust'. With the simulated (synthetic) feed, confidence is capped at 30, so it is often low. That is expected, not a fault.",
+  },
+  {
+    title: "What 'Not assessed' means",
+    text: "Some parts of a full picture, such as news, corporate events and fundamentals, have no data source connected yet. They are shown as 'Not assessed', never as zero, and the report says what share of the scoring weights the score covers. 'Not assessed' does not mean 'fine': it means nobody looked.",
+  },
+  {
+    title: "It is not advice",
+    text: "Research is decision support. The list is called Top Research Candidates on purpose: it is where to look first, not what to trade. Nothing here places an order, and nothing here is investment advice.",
+  },
+];
+
+const RESEARCH_FLOW = [
+  {
+    title: "Run a scan",
+    text: "Choose a universe (for example NIFTY50) and a depth on the Research overview. Watch the agents work. Check the banners: a red 'Synthetic data' banner means the numbers are test data, and 'market closed' means you are looking at the last session, not live prices.",
+    href: "/research",
+    link: "Open Research",
+  },
+  {
+    title: "Read the evidence",
+    text: "Open a candidate and click each score component to see the evidence, ticks and crosses, and the sources behind it. Look at Data verification and Not assessed as carefully as the score itself.",
+    href: "/research",
+    link: "Pick a candidate",
+  },
+  {
+    title: "Check the invalidation levels",
+    text: "Every report lists what would invalidate the setup, such as price closing back below VWAP. If you cannot say in advance what would prove the idea wrong, you are not ready to act on it.",
+    href: "/research",
+    link: "See a report",
+  },
+  {
+    title: "Test ideas in paper trading",
+    text: "If an idea still looks interesting, test it with a strategy in paper mode and backtest it with costs first. Compare what you find over many trades, not one.",
+    href: "/strategies/new",
+    link: "Create a strategy",
+  },
+];
+
+function ResearchGuide() {
+  return (
+    <div className="grid gap-5">
+      <p className="rounded-lg border bg-muted/40 p-3 text-sm text-muted-foreground">
+        The Research area helps you decide where to look. It is research and decision support only: not investment
+        advice, and not a recommendation to buy or sell anything.
+      </p>
+      <dl className="grid gap-3 md:grid-cols-2">
+        {RESEARCH_TERMS.map((t) => (
+          <div key={t.title} className="rounded-lg border bg-card p-4">
+            <dt className="text-sm font-semibold">{t.title}</dt>
+            <dd className="mt-1 text-sm text-muted-foreground">{t.text}</dd>
+          </div>
+        ))}
+      </dl>
+      <div>
+        <h3 className="mb-2 text-sm font-semibold">Recommended flow</h3>
+        <ol className="grid gap-3">
+          {RESEARCH_FLOW.map((step, i) => (
+            <li key={step.title} className="flex gap-3 rounded-lg border bg-card p-3 sm:p-4">
+              <span className="tabular flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold">
+                {i + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold">{step.title}</p>
+                <p className="mt-0.5 text-sm text-muted-foreground">{step.text}</p>
+                <Link
+                  href={step.href}
+                  className={cn(buttonVariants({ variant: "link", size: "sm" }), "mt-1 h-auto p-0 text-xs")}
+                >
+                  {step.link} <ChevronRight />
+                </Link>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  );
+}
+
 // ---------- Tabs ----------
 const TABS = [
   { value: "how", label: "How it works", body: <HowItWorks /> },
   { value: "workflow", label: "Recommended workflow", body: <Workflow /> },
+  { value: "research", label: "Research", body: <ResearchGuide /> },
   { value: "practice", label: "Do and don't", body: <DoAndDont /> },
   { value: "glossary", label: "Glossary", body: <Glossary /> },
   { value: "faq", label: "FAQ", body: <Faq /> },

@@ -1,0 +1,195 @@
+{
+  "success": true,
+  "message": "Market overview",
+  "status": {
+    "code": 200,
+    "description": "Market overview"
+  },
+  "data": {
+    "run_id": "0abede4a-8dc7-4669-aaa9-f31fc9cf1613",
+    "run_number": 1001,
+    "generated_at": "2026-09-21T21:04:05.060030Z",
+    "is_synthetic": true,
+    "data_source": "simulated",
+    "context": {
+      "as_of": "2026-09-21T21:04:03.494928Z",
+      "market_state": "PRE_MARKET",
+      "market_state_note": "The market has not opened yet. Analysis uses the last regular session (2026-09-21) and is not live.",
+      "indices": [
+        {
+          "symbol": "NIFTY",
+          "name": "NIFTY 50",
+          "available": true,
+          "price": 25280.12,
+          "change_pct": -2.6497023282322285,
+          "ema20": 24608.843871252404,
+          "ema50": 24527.735555309737,
+          "trend": "UP",
+          "rsi": 55.71600253160795,
+          "ret_5d_pct": 2.185126394882997
+        },
+        {
+          "symbol": "BANKNIFTY",
+          "name": "BANK NIFTY",
+          "available": true,
+          "price": 53465.73,
+          "change_pct": -0.7925907837918356,
+          "ema20": 52512.923608229925,
+          "ema50": 52774.649984546435,
+          "trend": "SIDEWAYS",
+          "rsi": 53.19028644625121,
+          "ret_5d_pct": 2.6311137046610034
+        }
+      ],
+      "india_vix": 13.24,
+      "india_vix_change_pct": -3.428154631655733,
+      "breadth": {
+        "advances": 4,
+        "declines": 4,
+        "unchanged": 0,
+        "universe_size": 8,
+        "pct_above_vwap": 62.5,
+        "pct_above_ema20": 37.5,
+        "note": "Computed over the scanned universe, not the whole exchange."
+      },
+      "regime": {
+        "label": "BULLISH",
+        "volatility": "NORMAL",
+        "confidence": 0.5,
+        "score": 0.33,
+        "factors": [
+          {
+            "name": "NIFTY vs 20-day EMA",
+            "value": "25,280 vs 24,609",
+            "bullish": true,
+            "detail": "Above the 20-day EMA is bullish"
+          },
+          {
+            "name": "NIFTY vs 50-day EMA",
+            "value": "25,280 vs 24,528",
+            "bullish": true,
+            "detail": "Above the 50-day EMA is bullish"
+          },
+          {
+            "name": "NIFTY 20-day EMA vs 50-day EMA",
+            "value": "24,609 vs 24,528",
+            "bullish": true,
+            "detail": "Fast average above slow is bullish"
+          },
+          {
+            "name": "NIFTY day change",
+            "value": "-2.65%",
+            "bullish": false,
+            "detail": "Beyond +/-0.3% counts"
+          },
+          {
+            "name": "BANK NIFTY vs 20-day EMA",
+            "value": "53,466 vs 52,513",
+            "bullish": true,
+            "detail": "Banks lead the index"
+          },
+          {
+            "name": "Advance / decline (scanned universe)",
+            "value": "4 up, 4 down",
+            "bullish": null,
+            "detail": "Above 60% advancing is bullish, below 40% bearish"
+          },
+          {
+            "name": "Stocks above 20-day EMA (scanned universe)",
+            "value": "38%",
+            "bullish": false,
+            "detail": "Above 60% is bullish, below 40% bearish"
+          },
+          {
+            "name": "India VIX",
+            "value": "13.2",
+            "bullish": null,
+            "detail": "High at 20 or above, low at 12 or below"
+          }
+        ]
+      },
+      "sectors": [
+        {
+          "sector": "Energy",
+          "constituents": 1,
+          "ret_1d_pct": 3.7532479356786386,
+          "ret_5d_pct": 5.805889453122215,
+          "rel_strength_1d": 6.402950263910867,
+          "rel_strength_5d": 3.620763058239218,
+          "avg_rel_volume": 0.9428855333798992,
+          "breadth_pct": 100.0,
+          "momentum": 59.599540052154964,
+          "trend": "UP",
+          "rank": 1
+        },
+        {
+          "sector": "FMCG",
+          "constituents": 1,
+          "ret_1d_pct": 3.53325950915504,
+          "ret_5d_pct": 0.7114406673513818,
+          "rel_strength_1d": 6.182961837387269,
+          "rel_strength_5d": -1.473685727531615,
+          "avg_rel_volume": 1.092943326385004,
+          "breadth_pct": 100.0,
+          "momentum": 46.49045231588785,
+          "trend": "SIDEWAYS",
+          "rank": 2
+        },
+        {
+          "sector": "Banking",
+          "constituents": 3,
+          "ret_1d_pct": -1.675838642662205,
+          "ret_5d_pct": -0.0008130861662107117,
+          "rel_strength_1d": 0.9738636855700236,
+          "rel_strength_5d": -2.1859394810492074,
+          "avg_rel_volume": 0.9986786864828568,
+          "breadth_pct": 33.33333333333333,
+          "momentum": 51.63553993581228,
+          "trend": "DOWN",
+          "rank": 3
+        },
+        {
+          "sector": "IT",
+          "constituents": 2,
+          "ret_1d_pct": -1.372772111104481,
+          "ret_5d_pct": -5.182825271403862,
+          "rel_strength_1d": 1.2769302171277475,
+          "rel_strength_5d": -7.367951666286859,
+          "avg_rel_volume": 0.9800583972761623,
+          "breadth_pct": 50.0,
+          "momentum": 43.609382631409176,
+          "trend": "SIDEWAYS",
+          "rank": 4
+        },
+        {
+          "sector": "Capital Goods",
+          "constituents": 1,
+          "ret_1d_pct": -2.8133215244682486,
+          "ret_5d_pct": -4.207393284022598,
+          "rel_strength_1d": -0.16361919623602006,
+          "rel_strength_5d": -6.392519678905595,
+          "avg_rel_volume": 1.0210434892664968,
+          "breadth_pct": 0.0,
+          "momentum": 41.60005941170802,
+          "trend": "DOWN",
+          "rank": 5
+        }
+      ],
+      "unavailable": [
+        "US overnight and Asian markets",
+        "USD/INR",
+        "Crude oil, gold and bond yields",
+        "Exchange-wide advance/decline (breadth is computed over the scanned universe)"
+      ],
+      "provenance": {
+        "source": "simulated",
+        "source_type": "SIMULATED",
+        "data_as_of": "2026-09-21T10:00:00Z",
+        "retrieved_at": "2026-09-21T21:04:03.509655Z",
+        "confidence": 0.1,
+        "stale": false,
+        "note": null
+      }
+    }
+  }
+}

@@ -42,6 +42,7 @@ class TradingEngine:
             await services.brokers.ensure_paper_account()
             await services.risk.get_config()
             await services.market_data.seed_instruments()
+            await services.research.bootstrap()
             restored = 0
             for order in await services.order_repo.list_active():
                 if order.broker_type is BrokerType.PAPER and order.broker_order_id:

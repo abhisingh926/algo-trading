@@ -224,11 +224,11 @@ async def test_market_data_endpoints(client, market_data):
     assert {q["symbol"]: q["ltp"] for q in quotes} == {"RELIANCE": 1000, "INFY": 1500}
     created = await client.post(
         "/api/v1/market-data/instruments",
-        json={"symbol": "tatasteel", "name": "Tata Steel", "exchange_token": "3499"},
+        json={"symbol": "newlistco", "name": "New Listing Co", "exchange_token": "999001"},
     )
-    assert created.status_code == 201 and created.json()["data"]["symbol"] == "TATASTEEL"
+    assert created.status_code == 201 and created.json()["data"]["symbol"] == "NEWLISTCO"
     assert (
-        await client.post("/api/v1/market-data/instruments", json={"symbol": "TATASTEEL"})
+        await client.post("/api/v1/market-data/instruments", json={"symbol": "NEWLISTCO"})
     ).status_code == 409
 
 

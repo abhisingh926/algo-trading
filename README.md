@@ -27,13 +27,14 @@ management, paper trading, backtesting with realistic costs, and a Next.js tradi
 7. [Running tests](#running-tests)
 8. [Paper trading walkthrough](#paper-trading-walkthrough)
 9. [New users and the good-practice review](#new-users-and-the-good-practice-review)
-10. [Backtesting](#backtesting)
-11. [Trading modes and the live trading guards](#trading-modes-and-the-live-trading-guards)
-12. [Dhan sandbox configuration](#dhan-sandbox-configuration)
-13. [Adding a broker](#adding-a-broker)
-14. [Logging and observability](#logging-and-observability)
-15. [Production deployment considerations](#production-deployment-considerations)
-16. [Known limitations](#known-limitations)
+10. [Market research module](#market-research-module)
+11. [Backtesting](#backtesting)
+12. [Trading modes and the live trading guards](#trading-modes-and-the-live-trading-guards)
+13. [Dhan sandbox configuration](#dhan-sandbox-configuration)
+14. [Adding a broker](#adding-a-broker)
+15. [Logging and observability](#logging-and-observability)
+16. [Production deployment considerations](#production-deployment-considerations)
+17. [Known limitations](#known-limitations)
 
 ## Architecture
 
@@ -111,10 +112,10 @@ The full API contract is in [docs/API_CONTRACT.md](docs/API_CONTRACT.md). Intera
 │   │   ├── strategies/ risk/ trading/ backtesting/ workers/ utils/
 │   │   └── api/v1/
 │   ├── alembic/                         migrations
-│   ├── tests/                           164 tests, no network, no real broker
+│   ├── tests/                           252 tests, no network, no real broker
 │   └── Dockerfile
 ├── frontend/                            Next.js App Router, Tailwind, shadcn/ui, TanStack Query, Recharts
-├── docs/API_CONTRACT.md, docs/USER_GUIDE.md
+├── docs/API_CONTRACT.md, docs/USER_GUIDE.md, docs/RESEARCH.md
 ├── docker-compose.yml  Makefile  .env.example
 ```
 
@@ -246,6 +247,7 @@ cannot reach a real broker. Coverage by area:
 | `test_dhan_broker.py` | mocked Dhan + Zerodha APIs, status mapping, error mapping, secret redaction in logs |
 | `test_safety.py` | PAPER never reaches a real broker, every live guard, kill switch |
 | `test_api.py` | response envelope, auth, full user journey, no credential leakage |
+| `test_research_*.py` | indicators, sessions, features, historical statistics, scoring, verification, risk, market regime, and an end-to-end research run |
 
 ## Paper trading walkthrough
 
@@ -284,6 +286,16 @@ reward to risk, timeframe and costs, indicator settings, backtest quality (lengt
 drawdown, costs, synthetic data, staleness) and, for real-money modes, the paper trading record.
 It is advisory only and never blocks an action. Thresholds are constants in
 `backend/app/risk/strategy_review.py` and are covered by `tests/test_review.py`.
+
+## Market research module
+
+An explainable, sourced research report for Indian stocks: scanner, multi-timeframe technicals, historical setup
+statistics, market regime and sectors, data verification, a deterministic configurable score (0 to 100) and a **separate**
+Data Confidence. It is decision support, never a "buy" signal, and it does not place orders.
+
+Open **Research** in the app, or `POST /api/v1/research/run`. With the default synthetic data feed every report is labelled
+synthetic and its confidence is capped at 30. Full description, methodology, limits and roadmap:
+[docs/RESEARCH.md](docs/RESEARCH.md).
 
 ## Backtesting
 
