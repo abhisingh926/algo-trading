@@ -46,6 +46,12 @@ class ResearchSource(UUIDMixin, TimestampMixin, Base):
     connected: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     rate_limit_per_minute: Mapped[int | None] = mapped_column(Integer)
     reliability_score: Mapped[float] = mapped_column(Float, nullable=False)
+    # What this source could supply once an adapter exists. Agents ask the registry rather than hardcoding names.
+    supports_market_data: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    supports_news: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    supports_filings: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    supports_fundamentals: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    supports_derivatives: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     notes: Mapped[str | None] = mapped_column(Text)
 
 
@@ -163,6 +169,7 @@ class ResearchScore(UUIDMixin, Base):
     as_of: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False)
     research_score: Mapped[float | None] = mapped_column(Float)
     data_confidence: Mapped[float] = mapped_column(Float, nullable=False)
+    risk_score: Mapped[float | None] = mapped_column(Float)  # 0 to 100, higher means more risk
     coverage_pct: Mapped[float] = mapped_column(Float, nullable=False)
     direction: Mapped[str] = mapped_column(String(8), nullable=False)
     setup_quality: Mapped[str] = mapped_column(String(10), nullable=False)
@@ -304,3 +311,51 @@ class ResearchRiskEvent(UUIDMixin, Base):
     message: Mapped[str] = mapped_column(Text, nullable=False)
     metric: Mapped[str | None] = mapped_column(String(40))
     value: Mapped[float | None] = mapped_column(Float)
+
+
+class ResearchCalibrationResult(UUIDMixin, Base):
+    """What actually happened after a research score. One row per scored candidate per run."""
+
+    __tablename__ = "research_calibration_results"
+    __table_args__ = (
+        UniqueConstraint("run_id", "symbol"),
+        Index("ix_research_calibration_bucket", "bucket", "as_of"),
+    )
+
+    run_id: Mapped[str] = mapped_column(ForeignKey("research_runs.id", ondelete="CASCADE"), index=True)
+    symbol: Mapped[str] = mapped_column(String(50), index=True, nullable=False)
+    as_of: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False)
+    measured_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow, nullable=False)
+    research_score: Mapped[float] = mapped_column(Float, nullable=False)
+    data_confidence: Mapped[float] = mapped_column(Float, nullable=False)
+    risk_score: Mapped[float | None] = mapped_column(Float)
+    direction: Mapped[str] = mapped_column(String(8), nullable=False)
+    bucket: Mapped[str] = mapped_column(String(10), nullable=False)
+    entry_time: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    entry_price: Mapped[float | None] = mapped_column(Float)
+    # Direction-aligned percent returns. NULL means the horizon could not be measured, never zero.
+    ret_5m: Mapped[float | None] = mapped_column(Float)
+    ret_15m: Mapped[float | None] = mapped_column(Float)
+    ret_30m: Mapped[float | None] = mapped_column(Float)
+    ret_1h: Mapped[float | None] = mapped_column(Float)
+    mfe_pct: Mapped[float | None] = mapped_column(Float)
+    mae_pct: Mapped[float | None] = mapped_column(Float)
+    horizons_complete: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    directionless: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    measurable: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    bars_source: Mapped[str | None] = mapped_column(String(10))
+    note: Mapped[str | None] = mapped_column(Text)
+
+
+class ResearchDataQualityEvent(UUIDMixin, Base):
+    """Output of the research quality check that runs after every research run."""
+
+    __tablename__ = "research_data_quality_events"
+
+    run_id: Mapped[str] = mapped_column(ForeignKey("research_runs.id", ondelete="CASCADE"), index=True)
+    symbol: Mapped[str | None] = mapped_column(String(50))
+    check_key: Mapped[str] = mapped_column(String(50), nullable=False)
+    status: Mapped[str] = mapped_column(String(8), nullable=False)  # PASS | WARN | FAIL
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    detail: Mapped[dict[str, Any] | None] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow, nullable=False)

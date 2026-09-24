@@ -9,8 +9,10 @@ from app.models.position import Position
 from app.models.research import (
     ResearchAgentOutput,
     ResearchAgentRun,
+    ResearchCalibrationResult,
     ResearchCandidate,
     ResearchClaim,
+    ResearchDataQualityEvent,
     ResearchHistoricalPattern,
     ResearchMarketSnapshot,
     ResearchRiskEvent,
@@ -31,6 +33,8 @@ from app.models.user import User
 
 __all__ = [
     "ResearchAgentOutput",
+    "ResearchCalibrationResult",
+    "ResearchDataQualityEvent",
     "ResearchAgentRun",
     "ResearchCandidate",
     "ResearchClaim",

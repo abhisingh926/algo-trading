@@ -41,6 +41,7 @@ _BASE_PRICES = {
     "NIFTY": 24500.0,
     "BANKNIFTY": 53000.0,
     "INDIAVIX": 14.0,
+    "FINNIFTY": 23500.0,
 }
 # (period in minutes, amplitude in log-price)
 _WAVES = (

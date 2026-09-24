@@ -943,6 +943,164 @@
     }
    }
   },
+  "/api/v1/research/runs/{run_id}/calibrate": {
+   "post": {
+    "tags": [
+     "Research"
+    ],
+    "summary": "Calibrate Run",
+    "description": "Measure the market that followed each score in this run. Needs an hour of trading to have passed.",
+    "operationId": "calibrate_run_api_v1_research_runs__run_id__calibrate_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "force",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "boolean",
+       "default": false,
+       "title": "Force"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiResponse_dict_"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/research/runs/{run_id}/calibration": {
+   "get": {
+    "tags": [
+     "Research"
+    ],
+    "summary": "Run Calibration",
+    "operationId": "run_calibration_api_v1_research_runs__run_id__calibration_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiResponse_dict_"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/research/calibration": {
+   "get": {
+    "tags": [
+     "Research"
+    ],
+    "summary": "Calibration",
+    "description": "Outcomes by score bucket across every calibrated run. Measured results, not a prediction.",
+    "operationId": "calibration_api_v1_research_calibration_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiResponse_dict_"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/v1/research/calibration/pending": {
+   "get": {
+    "tags": [
+     "Research"
+    ],
+    "summary": "Calibration Pending",
+    "operationId": "calibration_pending_api_v1_research_calibration_pending_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiResponse_list_dict__"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
   "/api/v1/research/{symbol}": {
    "get": {
     "tags": [
@@ -1299,6 +1457,224 @@
         "schema": {
          "$ref": "#/components/schemas/ApiResponse_SourcesView_"
         }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/research/{symbol}/verification": {
+   "get": {
+    "tags": [
+     "Research"
+    ],
+    "summary": "Verification",
+    "description": "Claims, their status and the sources behind them.",
+    "operationId": "verification_api_v1_research__symbol__verification_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "symbol",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Symbol"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Run Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiResponse_SourcesView_"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/research/{symbol}/agent-trace": {
+   "get": {
+    "tags": [
+     "Research"
+    ],
+    "summary": "Agent Trace",
+    "description": "What each agent did for this report, so the research is auditable.",
+    "operationId": "agent_trace_api_v1_research__symbol__agent_trace_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "symbol",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Symbol"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Run Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiResponse_list_dict__"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/research/{symbol}/corporate-events": {
+   "get": {
+    "tags": [
+     "Research"
+    ],
+    "summary": "Corporate Events",
+    "operationId": "corporate_events_api_v1_research__symbol__corporate_events_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "symbol",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Symbol"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/research/{symbol}/derivatives": {
+   "get": {
+    "tags": [
+     "Research"
+    ],
+    "summary": "Derivatives",
+    "operationId": "derivatives_api_v1_research__symbol__derivatives_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "symbol",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Symbol"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
        }
       }
      },
@@ -2935,6 +3311,40 @@
     ],
     "title": "ApiResponse[WeightSetRead]"
    },
+   "ApiResponse_dict_": {
+    "properties": {
+     "success": {
+      "type": "boolean",
+      "title": "Success",
+      "default": true
+     },
+     "message": {
+      "type": "string",
+      "title": "Message"
+     },
+     "status": {
+      "$ref": "#/components/schemas/StatusInfo"
+     },
+     "data": {
+      "anyOf": [
+       {
+        "additionalProperties": true,
+        "type": "object"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Data"
+     }
+    },
+    "type": "object",
+    "required": [
+     "message",
+     "status"
+    ],
+    "title": "ApiResponse[dict]"
+   },
    "ApiResponse_list_BacktestEquityPoint__": {
     "properties": {
      "success": {
@@ -3618,6 +4028,43 @@
      "status"
     ],
     "title": "ApiResponse[list[WeightSetRead]]"
+   },
+   "ApiResponse_list_dict__": {
+    "properties": {
+     "success": {
+      "type": "boolean",
+      "title": "Success",
+      "default": true
+     },
+     "message": {
+      "type": "string",
+      "title": "Message"
+     },
+     "status": {
+      "$ref": "#/components/schemas/StatusInfo"
+     },
+     "data": {
+      "anyOf": [
+       {
+        "items": {
+         "additionalProperties": true,
+         "type": "object"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Data"
+     }
+    },
+    "type": "object",
+    "required": [
+     "message",
+     "status"
+    ],
+    "title": "ApiResponse[list[dict]]"
    },
    "ArmLiveRequest": {
     "properties": {
@@ -4627,6 +5074,17 @@
        }
       ],
       "title": "Data Confidence"
+     },
+     "risk_score": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Risk Score"
      },
      "coverage_pct": {
       "anyOf": [
@@ -7607,6 +8065,46 @@
     ],
     "title": "Provenance"
    },
+   "QualityCheckRead": {
+    "properties": {
+     "key": {
+      "type": "string",
+      "title": "Key"
+     },
+     "status": {
+      "type": "string",
+      "enum": [
+       "PASS",
+       "WARN",
+       "FAIL"
+      ],
+      "title": "Status"
+     },
+     "message": {
+      "type": "string",
+      "title": "Message"
+     },
+     "detail": {
+      "anyOf": [
+       {
+        "additionalProperties": true,
+        "type": "object"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Detail"
+     }
+    },
+    "type": "object",
+    "required": [
+     "key",
+     "status",
+     "message"
+    ],
+    "title": "QualityCheckRead"
+   },
    "QuoteRead": {
     "properties": {
      "symbol": {
@@ -7831,6 +8329,17 @@
       "type": "number",
       "title": "Data Confidence"
      },
+     "risk_score": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Risk Score"
+     },
      "direction": {
       "type": "string",
       "title": "Direction"
@@ -7941,6 +8450,17 @@
      "data_confidence": {
       "type": "number",
       "title": "Data Confidence"
+     },
+     "risk_score": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Risk Score"
      },
      "score_coverage_pct": {
       "type": "number",
@@ -8075,6 +8595,23 @@
       "type": "array",
       "title": "Not Assessed"
      },
+     "quality_status": {
+      "type": "string",
+      "enum": [
+       "PASS",
+       "WARN",
+       "FAIL"
+      ],
+      "title": "Quality Status",
+      "default": "PASS"
+     },
+     "quality_checks": {
+      "items": {
+       "$ref": "#/components/schemas/QualityCheckRead"
+      },
+      "type": "array",
+      "title": "Quality Checks"
+     },
      "disclaimer": {
       "type": "string",
       "title": "Disclaimer",
@@ -8094,6 +8631,7 @@
      "is_synthetic",
      "research_score",
      "data_confidence",
+     "risk_score",
      "score_coverage_pct",
      "direction",
      "setup_quality",
@@ -8541,6 +9079,34 @@
    },
    "RiskAssessment": {
     "properties": {
+     "risk_score": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Risk Score"
+     },
+     "risk_direction": {
+      "type": "string",
+      "title": "Risk Direction",
+      "default": "Higher means more risk (0 to 100)."
+     },
+     "coverage_pct": {
+      "type": "number",
+      "title": "Coverage Pct",
+      "default": 0.0
+     },
+     "components": {
+      "items": {
+       "$ref": "#/components/schemas/RiskComponent"
+      },
+      "type": "array",
+      "title": "Components"
+     },
      "flags": {
       "items": {
        "$ref": "#/components/schemas/RiskFlag"
@@ -8567,6 +9133,17 @@
        "UNKNOWN"
       ],
       "title": "Volatility Risk"
+     },
+     "activity_risk": {
+      "type": "string",
+      "enum": [
+       "LOW",
+       "MEDIUM",
+       "HIGH",
+       "UNKNOWN"
+      ],
+      "title": "Activity Risk",
+      "default": "UNKNOWN"
      },
      "event_risk": {
       "type": "string",
@@ -8633,6 +9210,7 @@
     },
     "type": "object",
     "required": [
+     "risk_score",
      "flags",
      "liquidity_risk",
      "volatility_risk",
@@ -8643,6 +9221,65 @@
      "provenance"
     ],
     "title": "RiskAssessment"
+   },
+   "RiskComponent": {
+    "properties": {
+     "key": {
+      "type": "string",
+      "title": "Key"
+     },
+     "label": {
+      "type": "string",
+      "title": "Label"
+     },
+     "score": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Score"
+     },
+     "level": {
+      "type": "string",
+      "enum": [
+       "LOW",
+       "MEDIUM",
+       "HIGH",
+       "UNKNOWN"
+      ],
+      "title": "Level"
+     },
+     "weight": {
+      "type": "number",
+      "title": "Weight"
+     },
+     "summary": {
+      "type": "string",
+      "title": "Summary"
+     },
+     "evidence": {
+      "items": {
+       "$ref": "#/components/schemas/EvidenceItem"
+      },
+      "type": "array",
+      "title": "Evidence"
+     }
+    },
+    "type": "object",
+    "required": [
+     "key",
+     "label",
+     "score",
+     "level",
+     "weight",
+     "summary"
+    ],
+    "title": "RiskComponent",
+    "description": "One measured dimension of risk. `score` runs 0 (no concern) to 100 (severe); None means not assessed."
    },
    "RiskConfigurationRead": {
     "properties": {
@@ -9287,6 +9924,17 @@
      "data_confidence": {
       "type": "number",
       "title": "Data Confidence"
+     },
+     "risk_score": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Risk Score"
      },
      "direction": {
       "type": "string",

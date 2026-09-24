@@ -17,10 +17,12 @@ from app.repositories.pnl_repository import PnlRepository
 from app.repositories.position_repository import PositionRepository
 from app.repositories.research_repository import (
     ResearchAgentRunRepository,
+    ResearchCalibrationRepository,
     ResearchCandidateRepository,
     ResearchClaimRepository,
     ResearchOutputRepository,
     ResearchPatternRepository,
+    ResearchQualityRepository,
     ResearchRiskEventRepository,
     ResearchRunRepository,
     ResearchScoreRepository,
@@ -37,6 +39,7 @@ from app.repositories.user_repository import UserRepository
 from app.services.auth_service import AuthService
 from app.services.backtest_service import BacktestService
 from app.services.broker_service import BrokerService
+from app.services.calibration_service import CalibrationService
 from app.services.event_service import EventService
 from app.services.guide_service import GuideService
 from app.services.market_data_service import MarketDataService
@@ -169,7 +172,11 @@ class Services:
     @cached_property
     def market_data(self) -> MarketDataService:
         return MarketDataService(
-            self.container.market_data, self.container.quote_cache, self.candle_repo, self.instrument_repo
+            self.container.market_data,
+            self.container.quote_cache,
+            self.candle_repo,
+            self.instrument_repo,
+            self.container.fetch_attempts,
         )
 
     @cached_property
@@ -263,6 +270,8 @@ class Services:
             ResearchWeightRepository(s),
             ResearchUniverseRepository(s),
             ResearchSourceRepository(s),
+            ResearchCalibrationRepository(s),
+            ResearchQualityRepository(s),
             self.instrument_repo,
             self.container.market_data.name,
         )
@@ -275,6 +284,10 @@ class Services:
             self.container.market_data.name,
             self.container.research_runner.submit,
         )
+
+    @cached_property
+    def calibration(self) -> CalibrationService:
+        return CalibrationService(self.research_store, self.market_data)
 
     @cached_property
     def guide(self) -> GuideService:

@@ -9,8 +9,10 @@ from sqlalchemy import delete, func, select, update
 from app.models.research import (
     ResearchAgentOutput,
     ResearchAgentRun,
+    ResearchCalibrationResult,
     ResearchCandidate,
     ResearchClaim,
+    ResearchDataQualityEvent,
     ResearchHistoricalPattern,
     ResearchMarketSnapshot,
     ResearchRiskEvent,
@@ -357,3 +359,43 @@ class ResearchUniverseRepository(BaseRepository[ResearchUniverseMember]):
         await self.session.execute(
             delete(ResearchUniverseMember).where(ResearchUniverseMember.universe == universe)
         )
+
+
+class ResearchCalibrationRepository(BaseRepository[ResearchCalibrationResult]):
+    model = ResearchCalibrationResult
+
+    async def for_run(self, run_id: str) -> Sequence[ResearchCalibrationResult]:
+        stmt = (
+            select(ResearchCalibrationResult)
+            .where(ResearchCalibrationResult.run_id == run_id)
+            .order_by(ResearchCalibrationResult.research_score.desc())
+        )
+        return (await self.session.scalars(stmt)).all()
+
+    async def all_results(self, limit: int = 20000) -> Sequence[ResearchCalibrationResult]:
+        stmt = select(ResearchCalibrationResult).order_by(ResearchCalibrationResult.as_of.asc()).limit(limit)
+        return (await self.session.scalars(stmt)).all()
+
+    async def calibrated_run_ids(self) -> set[str]:
+        stmt = select(ResearchCalibrationResult.run_id).distinct()
+        return {rid for (rid,) in (await self.session.execute(stmt)).all()}
+
+    async def replace_for_run(self, run_id: str, rows: list[ResearchCalibrationResult]) -> None:
+        await self.session.execute(
+            delete(ResearchCalibrationResult).where(ResearchCalibrationResult.run_id == run_id)
+        )
+        self.session.add_all(rows)
+        await self.session.flush()
+
+
+class ResearchQualityRepository(BaseRepository[ResearchDataQualityEvent]):
+    model = ResearchDataQualityEvent
+
+    async def for_run(self, run_id: str, symbol: str | None = None) -> Sequence[ResearchDataQualityEvent]:
+        stmt = select(ResearchDataQualityEvent).where(ResearchDataQualityEvent.run_id == run_id)
+        if symbol:
+            stmt = stmt.where(ResearchDataQualityEvent.symbol == symbol.upper())
+        return (await self.session.scalars(stmt)).all()
+
+    async def add_many(self, rows: list[ResearchDataQualityEvent]) -> None:
+        self.session.add_all(rows)

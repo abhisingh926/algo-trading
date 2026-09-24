@@ -297,6 +297,7 @@ def assemble(
         is_synthetic=is_synthetic,
         research_score=score.research_score,
         data_confidence=verification.data_confidence,
+        risk_score=risk.risk_score,
         score_coverage_pct=score.coverage_pct,
         direction=score.direction,
         setup_quality=score.setup_quality,

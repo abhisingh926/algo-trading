@@ -40,6 +40,7 @@ AGENT_LABELS: dict[str, str] = {
     "MarketRiskAgent": "Market & Risk Analysis",
     "QuantScoringAgent": "Quant Scoring",
     "ResearchSynthesizerAgent": "Research Synthesis",
+    "ResearchQualityAgent": "Research Quality Check",
 }
 # Agents that do not exist yet. They are listed in every run so the UI is honest about what was NOT analysed.
 UNAVAILABLE_AGENTS: dict[str, str] = {
@@ -55,6 +56,9 @@ DISCLAIMER = (
 )
 
 
+Freshness = Literal["LIVE", "RECENT", "STALE", "UNKNOWN"]
+
+
 class Provenance(BaseModel):
     source: str
     source_type: SourceType
@@ -62,6 +66,8 @@ class Provenance(BaseModel):
     retrieved_at: datetime
     confidence: float = Field(ge=0, le=1)
     stale: bool = False
+    freshness: Freshness = "UNKNOWN"  # stale data must never look the same as live data
+    age_minutes: float | None = None
     note: str | None = None
 
 
@@ -293,10 +299,28 @@ class RiskFlag(BaseModel):
     value: float | None = None
 
 
+class RiskComponent(BaseModel):
+    """One measured dimension of risk. `score` runs 0 (no concern) to 100 (severe); None means not assessed."""
+
+    key: str
+    label: str
+    score: float | None
+    level: RiskLevel
+    weight: float
+    summary: str
+    evidence: list[EvidenceItem] = Field(default_factory=list)
+
+
 class RiskAssessment(BaseModel):
+    # Headline: 0 = no measured concern, 100 = severe. HIGHER MEANS MORE RISK.
+    risk_score: float | None
+    risk_direction: str = "Higher means more risk (0 to 100)."
+    coverage_pct: float = 0.0  # share of the risk weights that could actually be assessed
+    components: list[RiskComponent] = Field(default_factory=list)
     flags: list[RiskFlag]
     liquidity_risk: RiskLevel
     volatility_risk: RiskLevel
+    activity_risk: RiskLevel = "UNKNOWN"
     event_risk: RiskLevel = "UNKNOWN"
     corporate_risk: RiskLevel = "UNKNOWN"
     data_risk: RiskLevel
@@ -454,6 +478,13 @@ class ReportOverview(BaseModel):
     exchange: str = "NSE"
 
 
+class QualityCheckRead(BaseModel):
+    key: str
+    status: Literal["PASS", "WARN", "FAIL"]
+    message: str
+    detail: dict[str, Any] | None = None
+
+
 class AgentTrace(BaseModel):
     agent: str
     label: str
@@ -478,6 +509,7 @@ class ResearchReport(BaseModel):
     is_synthetic: bool
     research_score: float | None
     data_confidence: float
+    risk_score: float | None  # 0 to 100, higher means more risk. Separate from the two numbers above.
     score_coverage_pct: float
     direction: Direction
     setup_quality: Literal["STRONG", "MODERATE", "WEAK", "UNKNOWN"]
@@ -500,4 +532,6 @@ class ResearchReport(BaseModel):
     sources: list[SourceRef]
     agents: list[AgentTrace]
     not_assessed: list[str]  # what this report could not cover, stated plainly
+    quality_status: Literal["PASS", "WARN", "FAIL"] = "PASS"
+    quality_checks: list[QualityCheckRead] = Field(default_factory=list)
     disclaimer: str = DISCLAIMER

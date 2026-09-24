@@ -3,11 +3,14 @@
 // Notes on exactness:
 // * Field names, enums and nullability mirror the OpenAPI schemas.
 // * The OpenAPI marks response fields that have server-side defaults as "optional". The backend always serialises
-//   them (verified against every file in docs/research_samples), so they are typed as present here. The one
-//   exception is ResearchRunRead.agents, which the run list omits.
+//   them, so they are typed as present here. The one exception is ResearchRunRead.agents, which the run list omits.
 // * Request bodies (RunRequest, WeightSetCreate, SourceRegistryUpdate, UniverseWrite) keep their optional fields.
+// * Three headline numbers, never merged: research_score (higher = stronger setup), data_confidence
+//   (higher = more trustworthy data) and risk_score (HIGHER MEANS MORE RISK). risk.risk_direction says so in words.
 // * Confidence-like fields on agents, provenance, verification claims, sources and the market regime are 0..1;
-//   research_score, data_confidence and coverage percentages are 0..100.
+//   research_score, data_confidence, risk_score and coverage percentages are 0..100.
+// * The calibration endpoints are typed as bare dicts in the OpenAPI, so those interfaces below are written by hand
+//   from docs/API_CONTRACT.md ("Research v2 additions") and are marked as such.
 
 export type AgentStatus = "PENDING" | "RUNNING" | "SUCCESS" | "PARTIAL" | "FAILED" | "SKIPPED" | "NOT_AVAILABLE";
 export type ClaimStatus = "VERIFIED" | "PARTIALLY_VERIFIED" | "CONFLICTING" | "UNVERIFIED" | "STALE";
@@ -18,6 +21,7 @@ export type MarketState = "OPEN" | "PRE_MARKET" | "POST_MARKET" | "CLOSED";
 export type PriceStructure = "HIGHER_HIGHS_LOWS" | "LOWER_HIGHS_LOWS" | "MIXED" | "UNKNOWN";
 export type PriceVolumeRelation =
   "PRICE_UP_VOLUME_UP" | "PRICE_UP_VOLUME_DOWN" | "PRICE_DOWN_VOLUME_UP" | "PRICE_DOWN_VOLUME_DOWN" | "UNKNOWN";
+export type QualityStatus = "PASS" | "WARN" | "FAIL";
 export type RegimeLabel = "STRONG_BULLISH" | "BULLISH" | "RANGE" | "BEARISH" | "STRONG_BEARISH" | "UNKNOWN";
 export type ResearchDepth = "QUICK" | "STANDARD" | "DEEP";
 export type ResearchDirection = "BULLISH" | "BEARISH" | "NEUTRAL";
@@ -117,6 +121,7 @@ export interface CandidateRead {
   vwap_position: string | null;
   research_score: number | null;
   data_confidence: number | null;
+  risk_score: number | null;
   coverage_pct: number | null;
   risk_level: string | null;
   direction: string | null;
@@ -289,6 +294,7 @@ export interface ResearchReport {
   is_synthetic: boolean;
   research_score: number | null;
   data_confidence: number;
+  risk_score: number | null;
   score_coverage_pct: number;
   direction: ResearchDirection;
   setup_quality: SetupQuality;
@@ -311,7 +317,16 @@ export interface ResearchReport {
   sources: SourceRef[];
   agents: AgentTrace[];
   not_assessed: string[];
+  quality_status: QualityStatus;
+  quality_checks: QualityCheckRead[];
   disclaimer: string;
+}
+
+export interface QualityCheckRead {
+  key: string;
+  status: QualityStatus;
+  message: string;
+  detail: Record<string, unknown> | null;
 }
 
 export interface ReportOverview {
@@ -426,6 +441,7 @@ export interface ScorePoint {
   as_of: string;
   research_score: number | null;
   data_confidence: number;
+  risk_score: number | null;
   direction: string;
   risk_level: string;
 }
@@ -442,6 +458,7 @@ export interface ReportSummary {
   as_of: string;
   research_score: number | null;
   data_confidence: number;
+  risk_score: number | null;
   direction: string;
   setup_quality: string;
   risk_level: string;
@@ -559,9 +576,14 @@ export interface PatternStat {
 }
 
 export interface RiskAssessment {
+  risk_score: number | null;
+  risk_direction: string;
+  coverage_pct: number;
+  components: RiskComponent[];
   flags: RiskFlag[];
   liquidity_risk: RiskLevel;
   volatility_risk: RiskLevel;
+  activity_risk: RiskLevel;
   event_risk: RiskLevel;
   corporate_risk: RiskLevel;
   data_risk: RiskLevel;
@@ -569,6 +591,16 @@ export interface RiskAssessment {
   overall: RiskLevel;
   unavailable_checks: string[];
   provenance: Provenance;
+}
+
+export interface RiskComponent {
+  key: string;
+  label: string;
+  score: number | null;
+  level: RiskLevel;
+  weight: number;
+  summary: string;
+  evidence: EvidenceItem[];
 }
 
 export interface RiskFlag {
@@ -708,4 +740,87 @@ export interface CandidatesQuery {
   order?: "desc" | "asc";
   include_unanalyzed?: boolean;
   limit?: number;
+}
+
+// ---------- Calibration ----------
+// The calibration endpoints are declared as bare `dict` in the OpenAPI, so these interfaces are written by hand
+// from docs/API_CONTRACT.md ("Research v2 additions") and verified against the backend's payload builders.
+// Every `number | null` here means "could not be measured", never zero.
+
+export type CalibrationBucket = "90-100" | "80-89" | "70-79" | "60-69" | "50-59" | "below-50";
+/** The horizons a calibration measures, shortest first. */
+export const CALIBRATION_HORIZONS = ["5m", "15m", "30m", "1h"] as const;
+export type CalibrationHorizon = (typeof CALIBRATION_HORIZONS)[number];
+
+export interface CalibrationBucketResult {
+  bucket: CalibrationBucket;
+  occurrences: number;
+  /** false means the bucket has too few occurrences: show the count and note, and no rates. */
+  sample_adequate: boolean;
+  win_rate: number | null;
+  mean_returns: Record<CalibrationHorizon, number | null>;
+  median_return_1h: number | null;
+  mean_mfe_pct: number | null;
+  mean_mae_pct: number | null;
+  mean_score: number | null;
+  note: string | null;
+}
+
+export interface CalibrationSummary {
+  measured: number;
+  directionless_excluded: number;
+  unmeasurable: number;
+  adequate_buckets: number;
+  /** null when fewer than two buckets have an adequate sample, so they cannot be compared. */
+  ordered_as_expected: boolean | null;
+  period_start: string | null;
+  period_end: string | null;
+  verdict: string;
+  caveats: string[];
+  min_sample: number;
+  buckets: CalibrationBucketResult[];
+}
+
+export interface CalibrationResultRow {
+  symbol: string;
+  research_score: number | null;
+  data_confidence: number | null;
+  risk_score: number | null;
+  direction: string;
+  bucket: string | null;
+  entry_time: string | null;
+  entry_price: number | null;
+  ret_5m: number | null;
+  ret_15m: number | null;
+  ret_30m: number | null;
+  ret_1h: number | null;
+  mfe_pct: number | null;
+  mae_pct: number | null;
+  measurable: boolean;
+  directionless: boolean;
+  note: string | null;
+}
+
+/** POST /research/runs/{id}/calibrate and GET /research/runs/{id}/calibration. */
+export interface RunCalibration {
+  run_id: string;
+  run_number: number;
+  as_of: string;
+  is_synthetic: boolean;
+  candidates: number;
+  summary: CalibrationSummary;
+  results: CalibrationResultRow[];
+}
+
+/** GET /research/calibration. Note `results` here is a COUNT, unlike the per-run payload's array. */
+export interface OverallCalibration {
+  runs_calibrated: number;
+  results: number;
+  summary: CalibrationSummary;
+}
+
+export interface PendingCalibrationRun {
+  run_id: string;
+  run_number: number;
+  as_of: string;
 }

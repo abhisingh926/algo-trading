@@ -208,6 +208,18 @@ def expected_last_session(now: datetime) -> date:
     return day
 
 
+LIVE_MINUTES = 5.0
+
+
+def freshness_label(age_minutes: float, state: str, stale: bool) -> str:
+    """LIVE, RECENT or STALE. While the market is closed nothing can be live, so the best available is RECENT."""
+    if stale:
+        return "STALE"
+    if state != "OPEN":
+        return "RECENT"
+    return "LIVE" if age_minutes <= LIVE_MINUTES else "RECENT"
+
+
 def freshness(
     now: datetime, data_as_of: datetime, state: str, stale_minutes_open: float = 20.0
 ) -> tuple[float, bool, str | None]:

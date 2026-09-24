@@ -70,4 +70,5 @@ INDICES: tuple[tuple[str, str, str], ...] = (
     ("NIFTY", "NIFTY 50", "13"),
     ("BANKNIFTY", "NIFTY BANK", "25"),
     ("INDIAVIX", "INDIA VIX", "21"),
+    ("FINNIFTY", "NIFTY FINANCIAL SERVICES", "27"),
 )

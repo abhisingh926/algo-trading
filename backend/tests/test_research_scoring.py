@@ -7,7 +7,7 @@ import pytest
 from app.research import risk as risk_mod
 from app.research import verification as ver
 from app.research.config import DEFAULT_THRESHOLDS, DEFAULT_WEIGHTS, validate_weights
-from app.research.contracts import RiskFlag, VerificationClaim
+from app.research.contracts import VerificationClaim
 from app.research.historical import analyze
 from app.research.scoring import ScoringInput, score_symbol
 from tests.research_helpers import make_bundle, market_context, provenance
@@ -17,13 +17,20 @@ WEIGHTS = dict(DEFAULT_WEIGHTS)
 
 def scoring_input(bundle, market=None, historical=None, flags=None, **overrides):  # noqa: ANN001, ANN201
     price = overrides.pop("price", bundle.price)
+    changed = dataclasses.replace(
+        bundle, price=price, volatility=overrides.pop("volatility", bundle.volatility)
+    )
+    risk = risk_mod.assess_risk(
+        changed, market or market_context(), DEFAULT_THRESHOLDS, provenance(), verification=None
+    )
+    if flags:
+        risk = risk.model_copy(update={"flags": [*risk.flags, *flags]})
     return ScoringInput(
         price=price,
-        volatility=overrides.pop("volatility", bundle.volatility),
+        volatility=changed.volatility,
         technical=bundle.technical,
         historical=historical,
-        risk_flags=flags or [],
-        unavailable_checks=[],
+        risk=risk,
         market=market or market_context(),
         sector=None,
         source_key="candles_15m",
@@ -67,17 +74,23 @@ def test_higher_liquidity_scores_higher(bundle):
 
 
 def test_extreme_risk_reduces_the_score_and_can_cap_it(bundle):
+    """Risk is measured from the data, so the score falls when the data itself is severe."""
     clean = score_symbol(scoring_input(bundle), WEIGHTS)
-    flags = [
-        RiskFlag(code="EXTREME_VOLATILITY", severity="HIGH", message="Extreme volatility"),
-        RiskFlag(code="LOW_LIQUIDITY", severity="HIGH", message="Very low liquidity"),
-    ]
-    risky = score_symbol(scoring_input(bundle, flags=flags), WEIGHTS)
-    assert component(risky, "risk").points == 0 and component(clean, "risk").points == 5
+    risky = score_symbol(
+        scoring_input(
+            bundle,
+            volatility=bundle.volatility.model_copy(update={"atr_pct": 8.0}),
+            price=bundle.price.model_copy(update={"avg_traded_value_cr": 1.0}),
+        ),
+        WEIGHTS,
+    )
+    inp_cap = float(DEFAULT_THRESHOLDS["risk_cap_score"])
+    clean_risk, risky_risk = component(clean, "risk"), component(risky, "risk")
+    assert risky_risk.metrics["risk_score"] > clean_risk.metrics["risk_score"] + 25
+    assert risky_risk.points < clean_risk.points
     assert risky.research_score < clean.research_score
-    high_bundle_score = score_symbol(scoring_input(bundle), {**WEIGHTS, "risk": 5})
-    assert (risky.capped and risky.research_score == 70.0) or risky.raw_score <= 70.0
-    assert high_bundle_score.capped is False
+    # A high-severity flag means the score can never exceed the cap, whether or not it was already below it.
+    assert risky.research_score <= inp_cap and (risky.raw_score <= inp_cap or risky.capped)
 
 
 def test_missing_components_lower_coverage_and_are_not_scored_as_zero(bundle):

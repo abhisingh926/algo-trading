@@ -3,7 +3,7 @@
 import csv
 import io
 import json
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, time, timedelta
 
 import httpx
 import pytest
@@ -20,6 +20,24 @@ from app.utils.time import utcnow
 from tests.conftest import build_container, make_settings
 
 SYMBOLS = ["RELIANCE", "TCS", "INFY"]
+
+
+def past_session_time(hours_back: int = 4) -> datetime:
+    """11:00 IST on the most recent weekday that is at least `hours_back` in the past.
+
+    Calibration needs the hour after a score to be inside the same trading session, so the test must not
+    depend on what time of day it happens to run.
+    """
+    from app.utils.time import IST
+
+    now = utcnow()
+    day = now.astimezone(IST).date()
+    for _ in range(10):
+        moment = datetime.combine(day, time(11, 0), tzinfo=IST).astimezone(UTC)
+        if day.weekday() < 5 and moment <= now - timedelta(hours=hours_back):
+            return moment
+        day -= timedelta(days=1)
+    raise AssertionError("no suitable past session time")
 
 
 @pytest_asyncio.fixture
@@ -71,7 +89,7 @@ async def test_full_research_flow(research):
         and run["data_source"] == "simulated"
     )
     agents = {a["agent"]: a for a in run["agents"]}
-    assert len(agents) == 9
+    assert len(agents) == 10  # nine research agents plus the quality check
     assert agents["MarketScannerAgent"]["status"] == "SUCCESS" and agents["QuantScoringAgent"]["records"] == 3
     for name in ("MarketResearchAgent", "NewsCatalystAgent", "FundamentalResearchAgent"):
         assert agents[name]["status"] == "NOT_AVAILABLE" and agents[name]["message"]
@@ -127,6 +145,15 @@ async def test_full_research_flow(research):
         "Research and decision support"
     )
     assert [a["status"] for a in report["agents"] if a["agent"] == "NewsCatalystAgent"] == ["NOT_AVAILABLE"]
+    quality = next(a for a in run["agents"] if a["agent"] == "ResearchQualityAgent")
+    assert quality["status"] == "SUCCESS" and quality["records"] == 3
+    assert report["quality_status"] in ("PASS", "WARN") and report["quality_checks"]
+    checks = {c["key"]: c for c in report["quality_checks"]}
+    assert checks["components_have_evidence"]["status"] == "PASS"
+    assert checks["sources_resolve"]["status"] == "PASS"
+    assert checks["no_unsupported_claims"]["status"] == "PASS"
+    assert checks["real_data"]["status"] == "WARN"  # synthetic feed is flagged, never hidden
+    assert report["risk_score"] is not None and 0 <= report["risk_score"] <= 100
     scanner_trace = next(a for a in report["agents"] if a["agent"] == "MarketScannerAgent")
     assert scanner_trace["status"] == "SUCCESS" and "not the research score" in scanner_trace["summary"]
     # every evidence item that names a source points at a source that exists in the report
@@ -409,3 +436,65 @@ async def test_symbols_with_special_characters_route_correctly(research):
         assert response.status_code == 200 and response.json()["data"]["symbol"] == symbol
     assert (await client.get("/api/v1/research/M%26M/technical")).json()["data"]["symbol"] == "M&M"
     assert (await client.get("/api/v1/research/candidates/M%26M")).json()["data"]["symbol"] == "M&M"
+
+
+async def test_calibration_measures_what_followed_each_score(research):
+    """A run from earlier in the day can be calibrated, because the hour that followed is in the data."""
+    container, client = research
+    # Not calibratable yet: this run's hour has not finished.
+    fresh = await start(client, container, depth="QUICK", symbols=["TCS"])
+    too_soon = await client.post(f"/api/v1/research/runs/{fresh}/calibrate")
+    assert (
+        too_soon.status_code == 409 and "cannot be calibrated yet" in too_soon.json()["status"]["description"]
+    )
+    assert (await client.get(f"/api/v1/research/runs/{fresh}/calibration")).status_code == 404
+
+    earlier = await start(client, container, depth="QUICK", symbols=SYMBOLS, as_of=past_session_time())
+    pending = (await client.get("/api/v1/research/calibration/pending")).json()["data"]
+    assert earlier in [p["run_id"] for p in pending] and fresh not in [p["run_id"] for p in pending]
+
+    done = await client.post(f"/api/v1/research/runs/{earlier}/calibrate")
+    assert done.status_code == 200, done.text
+    payload = done.json()["data"]
+    assert payload["candidates"] == 3 and payload["run_id"] == earlier
+    results = {r["symbol"]: r for r in payload["results"]}
+    assert set(results) == set(SYMBOLS)
+    for row in results.values():
+        assert row["entry_time"] is not None and row["entry_price"] > 0
+        assert row["bucket"] in {
+            b[0] for b in __import__("app.research.calibration", fromlist=["BUCKETS"]).BUCKETS
+        }
+        if row["measurable"]:
+            assert row["ret_1h"] is not None and row["mfe_pct"] >= row["ret_1h"] >= row["mae_pct"] - 1e-6
+
+    summary = payload["summary"]
+    assert summary["measured"] + summary["directionless_excluded"] + summary["unmeasurable"] == 3
+    assert any("not a prediction" in c for c in summary["caveats"])
+    assert any("brokerage" in c for c in summary["caveats"])
+    # Three candidates is far below the minimum, so no bucket may claim a rate.
+    assert summary["adequate_buckets"] == 0 and all(not b["sample_adequate"] for b in summary["buckets"])
+    assert all(b["win_rate"] is None for b in summary["buckets"])
+    assert "Not enough measured outcomes" in summary["verdict"]
+
+    stored = (await client.get(f"/api/v1/research/runs/{earlier}/calibration")).json()["data"]
+    assert stored["candidates"] == 3 and stored["summary"]["measured"] == summary["measured"]
+    overall = (await client.get("/api/v1/research/calibration")).json()["data"]
+    assert overall["runs_calibrated"] == 1 and overall["results"] == 3
+    # Calibrating twice replaces rather than duplicates.
+    await client.post(f"/api/v1/research/runs/{earlier}/calibrate")
+    assert (await client.get("/api/v1/research/calibration")).json()["data"]["results"] == 3
+
+
+async def test_verification_agent_trace_and_not_connected_endpoints(research):
+    container, client = research
+    await start(client, container, depth="STANDARD", symbols=["TCS"])
+    verification = (await client.get("/api/v1/research/TCS/verification")).json()["data"]
+    assert verification["claims"] and verification["data_confidence"] <= 30
+    trace = (await client.get("/api/v1/research/TCS/agent-trace")).json()["data"]
+    assert len(trace) == 10
+    by_agent = {a["agent"]: a for a in trace}
+    assert by_agent["ResearchQualityAgent"]["status"] == "SUCCESS"
+    assert by_agent["NewsCatalystAgent"]["status"] == "NOT_AVAILABLE"
+    for path in ("corporate-events", "derivatives"):
+        response = await client.get(f"/api/v1/research/TCS/{path}")
+        assert response.status_code == 501 and "connected yet" in response.json()["status"]["description"]

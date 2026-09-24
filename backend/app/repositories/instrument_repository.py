@@ -23,3 +23,19 @@ class InstrumentRepository(BaseRepository[Instrument]):
             like = f"%{query.upper()}%"
             stmt = stmt.where(or_(Instrument.symbol.like(like), Instrument.name.ilike(f"%{query}%")))
         return (await self.session.scalars(stmt.order_by(Instrument.symbol).limit(limit))).all()
+
+    async def find_by_isin(self, isin: str) -> Sequence[Instrument]:
+        stmt = select(Instrument).where(Instrument.isin == isin, Instrument.is_active.is_(True))
+        return (await self.session.scalars(stmt)).all()
+
+    async def find_by_token(self, token: str, exchange: str = "NSE") -> Sequence[Instrument]:
+        stmt = select(Instrument).where(
+            Instrument.exchange_token == token,
+            Instrument.exchange == exchange.upper(),
+            Instrument.is_active.is_(True),
+        )
+        return (await self.session.scalars(stmt)).all()
+
+    async def find_by_name(self, name: str) -> Sequence[Instrument]:
+        stmt = select(Instrument).where(Instrument.name.ilike(name.strip()), Instrument.is_active.is_(True))
+        return (await self.session.scalars(stmt)).all()

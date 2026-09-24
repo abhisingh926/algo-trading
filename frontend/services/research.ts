@@ -1,15 +1,20 @@
 import { api, request, requestBlob } from "@/lib/api";
 import type {
+  AgentTrace,
   CandidateList,
   CandidatesQuery,
   MarketOverview,
+  OverallCalibration,
+  PendingCalibrationRun,
   ReportSummary,
   ResearchReport,
   ResearchRunRead,
   ResearchSummaryRead,
+  RunCalibration,
   RunRequest,
   ScoreHistory,
   SectorOverview,
+  SourcesView,
   SourceRegistryRead,
   SourceRegistryUpdate,
   UniverseRead,
@@ -28,14 +33,28 @@ export const researchService = {
   candidates: (query: CandidatesQuery = {}) => api.get<CandidateList>("/research/candidates", query),
   market: (runId?: string) => api.get<MarketOverview>("/research/market", { run_id: runId }),
   sectors: (runId?: string) => api.get<SectorOverview>("/research/sectors", { run_id: runId }),
-  report: (symbol: string, runId?: string) =>
-    api.get<ResearchReport>(`/research/${sym(symbol)}`, { run_id: runId }),
+  report: (symbol: string, runId?: string) => api.get<ResearchReport>(`/research/${sym(symbol)}`, { run_id: runId }),
   symbolHistory: (symbol: string, limit = 30) =>
     api.get<ReportSummary[]>(`/research/${sym(symbol)}/history`, { limit }),
   scoreHistory: (symbol: string, limit = 30) =>
     api.get<ScoreHistory>(`/research/${sym(symbol)}/score-history`, { limit }),
-  /** Always answers 501 for now: no news source is connected. The ApiError carries the explanation. */
+  /** Same shape as /sources: claims, their status and the confidence breakdown. */
+  verification: (symbol: string, runId?: string) =>
+    api.get<SourcesView>(`/research/${sym(symbol)}/verification`, { run_id: runId }),
+  /** One entry per agent, for auditing. */
+  agentTrace: (symbol: string, runId?: string) =>
+    api.get<AgentTrace[]>(`/research/${sym(symbol)}/agent-trace`, { run_id: runId }),
+  /** These four always answer 501 for now. The ApiError carries the backend's own explanation. */
   news: (symbol: string) => request<unknown>(`/research/${sym(symbol)}/news`),
+  fundamentals: (symbol: string) => request<unknown>(`/research/${sym(symbol)}/fundamentals`),
+  corporateEvents: (symbol: string) => request<unknown>(`/research/${sym(symbol)}/corporate-events`),
+  derivatives: (symbol: string) => request<unknown>(`/research/${sym(symbol)}/derivatives`),
+
+  /** Calibration: what the market actually did after past scores. */
+  calibration: () => api.get<OverallCalibration>("/research/calibration"),
+  calibrationPending: () => api.get<PendingCalibrationRun[]>("/research/calibration/pending"),
+  runCalibration: (runId: string) => api.get<RunCalibration>(`/research/runs/${encodeURIComponent(runId)}/calibration`),
+  calibrateRun: (runId: string) => api.post<RunCalibration>(`/research/runs/${encodeURIComponent(runId)}/calibrate`),
   exportReport: (symbol: string, format: "json" | "csv", runId?: string) =>
     requestBlob(`/research/${sym(symbol)}/export`, { format, run_id: runId }),
 

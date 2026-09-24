@@ -8,13 +8,13 @@ import math
 from dataclasses import dataclass, field
 from typing import Any
 
-from app.research.config import COMPONENT_LABELS, COMPONENT_ORDER, RISK_DEDUCTION
+from app.research.config import COMPONENT_LABELS, COMPONENT_ORDER
 from app.research.contracts import (
     EvidenceItem,
     HistoricalAnalysis,
     MarketContext,
     PriceBlock,
-    RiskFlag,
+    RiskAssessment,
     ScoreComponent,
     ScoreResult,
     SectorSnapshot,
@@ -72,8 +72,7 @@ class ScoringInput:
     volatility: VolatilityBlock
     technical: TechnicalAnalysis
     historical: HistoricalAnalysis | None
-    risk_flags: list[RiskFlag]
-    unavailable_checks: list[str]
+    risk: RiskAssessment
     market: MarketContext
     sector: SectorSnapshot | None
     source_key: str
@@ -710,26 +709,40 @@ def score_historical(inp: ScoringInput, weights: dict[str, float]) -> ScoreCompo
 
 
 def score_risk(inp: ScoringInput, weights: dict[str, float]) -> ScoreComponent:
-    deduction = sum(RISK_DEDUCTION[f.severity] for f in inp.risk_flags)
-    fraction = clip(1.0 - deduction)
-    evidence = [EvidenceItem(label=f.message, value=f.severity.lower(), passed=False) for f in inp.risk_flags]
-    if not inp.risk_flags:
+    """Mirrors the Risk Score: the fewer measured concerns, the more of these points are kept."""
+    risk = inp.risk
+    if risk.risk_score is None:
+        return _component(
+            "risk", weights, None, "Risk could not be measured from the available data.", [], {}, None
+        )
+    fraction = clip(1.0 - risk.risk_score / 100)
+    evidence = [
+        EvidenceItem(
+            label=f"{c.label} ({c.weight:g}% of the risk score)",
+            value="not assessed" if c.score is None else f"{c.score:g} of 100 ({c.level.lower()})",
+            passed=None if c.score is None else c.score < 30,
+        )
+        for c in risk.components
+    ]
+    evidence += [EvidenceItem(label=f.message, value=f.severity.lower(), passed=False) for f in risk.flags]
+    if not risk.flags:
         evidence.append(
             EvidenceItem(
                 label="No risk flags raised by the checks that could be run", value="clear", passed=True
             )
         )
-    evidence += [
-        EvidenceItem(label=f"Not checked: {c}", value="no data source", passed=None)
-        for c in inp.unavailable_checks
-    ]
     return _component(
         "risk",
         weights,
         fraction,
-        f"{len(inp.risk_flags)} risk flag(s) reduce this component; unchecked risks are listed separately.",
+        f"Risk Score {risk.risk_score:g} of 100 ({risk.overall.lower()}); higher means more risk. "
+        f"Measured over {risk.coverage_pct:g}% of the risk weights.",
         evidence,
-        {"flags": [f.code for f in inp.risk_flags]},
+        {
+            "risk_score": risk.risk_score,
+            "coverage_pct": risk.coverage_pct,
+            "flags": [f.code for f in risk.flags],
+        },
         None,
     )
 
@@ -762,7 +775,7 @@ def score_symbol(
     raw = earned / available_points * 100 if available_points else None
     score, capped, reason = raw, False, None
     cap = float(inp.thresholds["risk_cap_score"])
-    if raw is not None and any(f.severity == "HIGH" for f in inp.risk_flags) and raw > cap:
+    if raw is not None and any(f.severity == "HIGH" for f in inp.risk.flags) and raw > cap:
         score, capped = cap, True
         reason = f"A high-severity risk flag caps the score at {cap:g}."
     quality = "UNKNOWN"

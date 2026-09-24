@@ -324,6 +324,70 @@ Semantics the UI must respect:
 * Historical statistics: a `PatternStat` with `sample_adequate=false` has no rates. Show its `occurrences` and note, greyed out.
 * Never label anything "best stocks" or "buy". The list is "Top Research Candidates".
 
+## Research v2 additions (risk score, calibration, quality)
+
+**Three separate headline numbers.** Every report and candidate row carries all three, and they must be shown
+separately and never merged:
+
+| Field | Range | Direction |
+|---|---|---|
+| `research_score` | 0 to 100, or null | higher is a stronger measured setup |
+| `data_confidence` | 0 to 100 | higher means the data can be trusted more |
+| `risk_score` | 0 to 100, or null | **higher means MORE risk** |
+
+`report.risk.risk_direction` carries that sentence, so the UI never has to guess the direction.
+
+### Risk detail (`report.risk`)
+
+```
+risk: {
+  risk_score: number|null, risk_direction: string, coverage_pct: number, overall: "LOW"|"MEDIUM"|"HIGH"|"UNKNOWN",
+  components: [{ key, label, score: number|null, level, weight, summary, evidence: EvidenceItem[] }],
+  flags: RiskFlag[], liquidity_risk, volatility_risk, activity_risk, event_risk, corporate_risk, data_risk,
+  market_risk, unavailable_checks: string[], provenance
+}
+```
+Component keys: `liquidity`, `volatility`, `activity`, `data`, `market`, `event`. A component with `score: null`
+was **not assessed** (no data source) and is excluded from the weighted score; `coverage_pct` says how much of the
+risk weight could be measured. Show those as "not assessed", never as zero.
+
+### Research quality (`report.quality_status`, `report.quality_checks`)
+
+`quality_status` is `PASS`, `WARN` or `FAIL`. `quality_checks` is a list of `{key, status, message, detail}`.
+Show a `WARN` or `FAIL` prominently; it means the research itself has a weakness, not that the stock is bad.
+The run's `agents[]` now has **ten** entries, including `ResearchQualityAgent`.
+
+### Calibration
+
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/research/runs/{id}/calibrate` | Measures the market that followed. 409 until an hour of trading has passed, 409 if the run is not COMPLETED |
+| GET | `/research/runs/{id}/calibration` | Stored results for one run. 404 if never calibrated |
+| GET | `/research/calibration` | Aggregate across every calibrated run |
+| GET | `/research/calibration/pending` | Completed runs old enough to calibrate but not yet done |
+
+```
+summary: { measured, directionless_excluded, unmeasurable, adequate_buckets, ordered_as_expected: bool|null,
+           period_start, period_end, verdict: string, caveats: string[], min_sample: number,
+           buckets: [{ bucket: "90-100"|"80-89"|"70-79"|"60-69"|"50-59"|"below-50", occurrences,
+                       sample_adequate: bool, win_rate: number|null, mean_returns: {"5m","15m","30m","1h"},
+                       median_return_1h, mean_mfe_pct, mean_mae_pct, mean_score, note }] }
+results: [{ symbol, research_score, risk_score, direction, bucket, entry_time, entry_price,
+            ret_5m, ret_15m, ret_30m, ret_1h, mfe_pct, mae_pct, measurable, directionless, note }]
+```
+Rules the UI must respect: a bucket with `sample_adequate: false` has **no rates** and shows only its count and
+note; `null` in a return means the horizon could not be measured, never zero; always show `verdict` and `caveats`,
+which state that these are measured outcomes and not a prediction, and that costs are excluded.
+
+### New per-stock endpoints
+
+| Path | Behaviour |
+|---|---|
+| `/research/{symbol}/verification` | Same shape as `/sources`: claims, statuses and confidence breakdown |
+| `/research/{symbol}/agent-trace` | `AgentTrace[]`, one entry per agent, for auditing |
+| `/research/{symbol}/corporate-events` | **501** until a filings source is connected |
+| `/research/{symbol}/derivatives` | **501** until an options and futures feed is connected |
+
 ## Conventions and clarifications
 
 * **CORS**: the backend allows the origins in `CORS_ORIGINS` with the `Authorization` header.

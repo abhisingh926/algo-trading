@@ -19,9 +19,6 @@ from app.utils.time import ist_day_end_utc, ist_day_start_utc, utcnow
 _COVERAGE_TOLERANCE = timedelta(days=4)  # weekends + exchange holidays
 _HEAD_TOLERANCE = timedelta(days=7)
 _ATTEMPT_TTL_SECONDS = 300
-# (instrument key, timeframe, "head" | "tail") -> monotonic time of the last fetch attempt. Stops a run from
-# re-requesting a range the provider has already answered (for example a weekend with no new bars).
-_FETCH_ATTEMPTS: dict[tuple[str, str, str], float] = {}
 
 # NSE large caps with their exchange tokens (Dhan securityId == NSE token).
 DEFAULT_INSTRUMENTS: tuple[tuple[str, str, str], ...] = (
@@ -49,11 +46,16 @@ class MarketDataService:
         cache: QuoteCache,
         candles: MarketDataRepository,
         instruments: InstrumentRepository,
+        fetch_attempts: dict[tuple[str, str, str], float] | None = None,
     ) -> None:
         self.provider = provider
         self.cache = cache
         self.candles = candles
         self.instruments = instruments
+        # (instrument key, timeframe, "head" | "tail") -> monotonic time of the last attempt. Stops a run from
+        # re-requesting a range the provider has already answered, for example a weekend with no new bars.
+        # It belongs to the container, not to the module, so a second database never inherits a stale guard.
+        self.fetch_attempts = {} if fetch_attempts is None else fetch_attempts
 
     # ---- instruments ---------------------------------------------------------------------------
     async def seed_instruments(self) -> int:
@@ -194,8 +196,8 @@ class MarketDataService:
         ranges = []
         for kind, window in wanted:
             key = (ref.key, timeframe.value, kind)
-            if now - _FETCH_ATTEMPTS.get(key, -1e9) >= _ATTEMPT_TTL_SECONDS:
-                _FETCH_ATTEMPTS[key] = now
+            if now - self.fetch_attempts.get(key, -1e9) >= _ATTEMPT_TTL_SECONDS:
+                self.fetch_attempts[key] = now
                 ranges.append(window)
         return ranges
 

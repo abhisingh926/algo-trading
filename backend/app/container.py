@@ -56,6 +56,10 @@ class AppContainer:
     workers: WorkerRegistry = field(default_factory=WorkerRegistry)
     research_runner: ResearchRunner = field(default_factory=ResearchRunner)
     fill_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
+    # Shared by every MarketDataService built from this container, so one process does not re-request a range
+    # the provider has already answered. Scoped here rather than to the module so tests and a second database
+    # never inherit another container's guard.
+    fetch_attempts: dict[tuple[str, str, str], float] = field(default_factory=dict)
 
     @classmethod
     def build(

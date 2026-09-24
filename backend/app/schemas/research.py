@@ -102,6 +102,7 @@ class CandidateRead(BaseModel):
     vwap_position: str | None
     research_score: float | None
     data_confidence: float | None
+    risk_score: float | None = None
     coverage_pct: float | None
     risk_level: str | None
     direction: str | None
@@ -154,6 +155,7 @@ class ReportSummary(BaseModel):
     as_of: datetime
     research_score: float | None
     data_confidence: float
+    risk_score: float | None = None
     direction: str
     setup_quality: str
     risk_level: str
@@ -166,6 +168,7 @@ class ScorePoint(BaseModel):
     as_of: datetime
     research_score: float | None
     data_confidence: float
+    risk_score: float | None = None
     direction: str
     risk_level: str
 
@@ -208,6 +211,11 @@ class SourceRegistryRead(ORMModel):
     connected: bool
     rate_limit_per_minute: int | None
     reliability_score: float
+    supports_market_data: bool = False
+    supports_news: bool = False
+    supports_filings: bool = False
+    supports_fundamentals: bool = False
+    supports_derivatives: bool = False
     notes: str | None
 
 

@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from app.research import historical as hist
+from app.research import quality as quality_mod
 from app.research import risk as risk_mod
 from app.research import synthesis, verification
 from app.research.config import merge_thresholds
@@ -16,6 +17,7 @@ from app.research.contracts import (
     AgentOutput,
     HistoricalAnalysis,
     MarketContext,
+    QualityCheckRead,
     ResearchReport,
     RiskAssessment,
     ScannerCandidate,
@@ -190,6 +192,21 @@ def run_verification(
     return claims, score, stale, message
 
 
+def data_completeness(
+    inp: SymbolInput, bundle: TechnicalBundle, historical: HistoricalAnalysis | None
+) -> float:
+    """Share of the data inputs this module would like to have that were actually available."""
+    present = [
+        bool(inp.bars_15m),
+        bool(inp.bars_5m),
+        inp.quote is not None,
+        bundle.price.spread_bps is not None,
+        bundle.price.avg_traded_value_cr is not None,
+        historical is not None,
+    ]
+    return sum(present) / len(present)
+
+
 def analyze_symbol(
     *,
     inp: SymbolInput,
@@ -268,26 +285,7 @@ def analyze_symbol(
     )
     timings["HistoricalTechnicalAgent"] = outputs["HistoricalTechnicalAgent"].duration_ms
 
-    # -- MarketRiskAgent ---------------------------------------------------------------------------------
-    t0 = time.perf_counter()
-    risk = risk_mod.assess_risk(bundle, market, thresholds, provenance)
-    outputs["MarketRiskAgent"] = envelope(
-        "MarketRiskAgent",
-        inp.symbol,
-        "SUCCESS",
-        provenance.confidence,
-        now,
-        t0,
-        [f"Overall risk {risk.overall.lower()}; {len(risk.flags)} flag(s)."]
-        + [f.message for f in risk.flags],
-        {"risk": risk.model_dump(mode="json")},
-        risks=[f.message for f in risk.flags],
-        sources=sources[:1],
-        warnings=[f"Not checked: {c}" for c in risk.unavailable_checks],
-    )
-    timings["MarketRiskAgent"] = outputs["MarketRiskAgent"].duration_ms
-
-    # -- DataVerificationAgent ---------------------------------------------------------------------------
+    # -- DataVerificationAgent (runs first: risk and confidence both depend on what the data is worth) -------
     t0 = time.perf_counter()
     claims: list[VerificationClaim] = []
     freshness_score, stale, stale_message = verification.freshness(
@@ -311,53 +309,74 @@ def analyze_symbol(
             warnings=[c.detail for c in claims if c.status in ("CONFLICTING", "STALE")],
         )
         timings["DataVerificationAgent"] = outputs["DataVerificationAgent"].duration_ms
-
-    # -- QuantScoringAgent -------------------------------------------------------------------------------
-    t0 = time.perf_counter()
-    preliminary = verification.finalize(
+    data_verification = verification.finalize(
         claims,
         inp.source_reliability,
         freshness_score,
-        1.0,
+        data_completeness(inp, bundle, historical),
         bool(historical and historical.matched),
         synthetic,
         provenance,
     )
-    flags = risk.flags + risk_mod.data_flags(
-        preliminary, synthetic, (historical.matched is not None) if historical else None, stale, stale_message
+
+    provenance = provenance.model_copy(
+        update={
+            "stale": stale,
+            "freshness": verification.freshness_label(provenance.age_minutes or 0.0, state, stale),
+            "note": stale_message or provenance.note,
+        }
     )
+    bundle.technical.provenance = provenance
+
+    # -- MarketRiskAgent ---------------------------------------------------------------------------------
+    t0 = time.perf_counter()
+    risk = risk_mod.assess_risk(
+        bundle,
+        market,
+        thresholds,
+        provenance,
+        verification=data_verification if config["verification"] else None,
+        is_synthetic=synthetic,
+        stale=stale,
+        stale_message=stale_message,
+        historical_adequate=(historical.matched is not None) if historical else None,
+    )
+    outputs["MarketRiskAgent"] = envelope(
+        "MarketRiskAgent",
+        inp.symbol,
+        "SUCCESS",
+        provenance.confidence,
+        now,
+        t0,
+        [
+            f"Risk Score {risk.risk_score if risk.risk_score is not None else 'n/a'} of 100 "
+            f"({risk.overall.lower()}, higher means more risk) over {risk.coverage_pct:g}% of the risk weights; "
+            f"{len(risk.flags)} flag(s)."
+        ]
+        + [f"{c.label}: {'not assessed' if c.score is None else f'{c.score:g}'}" for c in risk.components]
+        + [f.message for f in risk.flags],
+        {"risk": risk.model_dump(mode="json")},
+        risks=[f.message for f in risk.flags],
+        sources=sources[:1],
+        warnings=[f"Not checked: {c}" for c in risk.unavailable_checks],
+    )
+    timings["MarketRiskAgent"] = outputs["MarketRiskAgent"].duration_ms
+
+    # -- QuantScoringAgent -------------------------------------------------------------------------------
+    t0 = time.perf_counter()
     scoring_input = ScoringInput(
         price=bundle.price,
         volatility=bundle.volatility,
         technical=tech,
         historical=historical,
-        risk_flags=flags,
-        unavailable_checks=risk.unavailable_checks,
+        risk=risk,
         market=market,
         sector=sector,
         source_key="candles_15m",
         thresholds=thresholds,
     )
     score = score_symbol(scoring_input, weights, weight_set[0], weight_set[1])
-    final_verification = verification.finalize(
-        claims,
-        inp.source_reliability,
-        freshness_score,
-        score.coverage_pct / 100,
-        bool(historical and historical.matched),
-        synthetic,
-        provenance,
-    )
-    risk = risk.model_copy(
-        update={"flags": flags, "data_risk": risk_mod.data_risk_level(final_verification, synthetic, stale)}
-    )
-    risk = risk.model_copy(
-        update={
-            "overall": risk_mod.overall_level(
-                flags, [risk.liquidity_risk, risk.volatility_risk, risk.market_risk, risk.data_risk]
-            )
-        }
-    )
+    final_verification = data_verification
     outputs["QuantScoringAgent"] = envelope(
         "QuantScoringAgent",
         inp.symbol,
@@ -406,6 +425,26 @@ def analyze_symbol(
         [f"Assembled the report from {len(outputs)} agent outputs without adding new facts."],
         {"why_listed": report.why_listed, "invalidation": report.invalidation},
     )
+    # -- ResearchQualityAgent (checks the research itself before the report is handed over) ----------------
+    t0 = time.perf_counter()
+    quality = quality_mod.check_report(report)
+    report.quality_status = quality.status
+    report.quality_checks = [
+        QualityCheckRead(key=c.key, status=c.status, message=c.message, detail=c.detail)
+        for c in quality.checks
+    ]
+    outputs["ResearchQualityAgent"] = envelope(
+        "ResearchQualityAgent",
+        inp.symbol,
+        "SUCCESS" if quality.status != "FAIL" else "PARTIAL",
+        1.0 if quality.status == "PASS" else 0.5,
+        now,
+        t0,
+        [f"Research quality: {quality.status}."] + [f"{c.key}: {c.message}" for c in quality.checks],
+        {"checks": [{"key": c.key, "status": c.status, "message": c.message} for c in quality.checks]},
+        warnings=[c.message for c in quality.issues],
+    )
+    timings["ResearchQualityAgent"] = outputs["ResearchQualityAgent"].duration_ms
     report.agents = synthesis.build_traces(outputs)
     timings["ResearchSynthesizerAgent"] = outputs["ResearchSynthesizerAgent"].duration_ms
     return SymbolOutcome(report, outputs, historical, risk, score, claims, timings)

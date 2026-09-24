@@ -11,7 +11,7 @@ from app.research import risk as risk_mod
 from app.research import scanner
 from app.research import verification as ver
 from app.research.config import DEFAULT_THRESHOLDS
-from app.research.contracts import Breadth, IndexSnapshot
+from app.research.contracts import Breadth, IndexSnapshot, VerificationClaim
 from app.research.explain import explain_change
 from tests.research_helpers import ist, make_bundle, make_history, market_context, provenance
 
@@ -374,3 +374,132 @@ class TestScoreChangeExplanation:
         curr = report_dict(74.0, 1.5, "ABOVE", "BULLISH", [], volume_points=5.0)
         change = explain_change(prev, curr, "a", "b")
         assert change.reasons == ["Volume fell by 3.0 points"]
+
+
+class TestRiskScore:
+    """The Risk Score is a third number from 0 to 100 where HIGHER MEANS MORE RISK."""
+
+    @pytest.fixture(scope="class")
+    def bundle(self):  # noqa: ANN201
+        return make_bundle(sessions=90, keep_bars=14, seed=8)[1]
+
+    def assess(self, bundle, market=None, **kwargs):  # noqa: ANN001, ANN201
+        return risk_mod.assess_risk(
+            bundle, market or market_context(), DEFAULT_THRESHOLDS, provenance(), **kwargs
+        )
+
+    def test_direction_is_stated_and_the_score_is_bounded(self, bundle):
+        risk = self.assess(bundle)
+        assert "higher means more risk" in risk.risk_direction.lower()
+        assert 0 <= risk.risk_score <= 100
+        assert risk.overall == risk_mod.level_of(risk.risk_score)
+
+    def test_components_carry_weights_evidence_and_coverage(self, bundle):
+        risk = self.assess(bundle)
+        keys = {c.key for c in risk.components}
+        assert keys == set(risk_mod.RISK_WEIGHTS)
+        assert sum(risk_mod.RISK_WEIGHTS.values()) == 100
+        assert all(c.evidence for c in risk.components)
+        # event and corporate risk have no data source, so they are excluded and coverage says so
+        event = next(c for c in risk.components if c.key == "event")
+        assert event.score is None and event.level == "UNKNOWN" and "no data source" in event.summary
+        # verification did not run here either, so data is unassessed too: 100 - event(10) - data(20)
+        assert risk.coverage_pct == 70.0 and risk.event_risk == "UNKNOWN"
+        with_data = self.assess(
+            bundle, verification=ver.finalize([], 0.9, 1.0, 1.0, True, False, provenance())
+        )
+        assert with_data.coverage_pct == 90.0
+
+    def test_worse_data_raises_the_score(self, bundle):
+        calm = self.assess(bundle)
+        illiquid = (
+            self.assess(bundle, market=None)
+            if False
+            else self.assess(
+                dataclasses.replace(
+                    bundle, price=bundle.price.model_copy(update={"avg_traded_value_cr": 0.8})
+                )
+            )
+        )
+        volatile = self.assess(
+            dataclasses.replace(bundle, volatility=bundle.volatility.model_copy(update={"atr_pct": 9.0}))
+        )
+        assert illiquid.risk_score > calm.risk_score and illiquid.liquidity_risk == "HIGH"
+        assert volatile.risk_score > calm.risk_score and volatile.volatility_risk == "HIGH"
+
+    def test_one_severe_dimension_is_not_averaged_away(self, bundle):
+        """A stock that cannot be traded is risky even when everything else looks calm."""
+        illiquid = self.assess(
+            dataclasses.replace(bundle, price=bundle.price.model_copy(update={"avg_traded_value_cr": 0.5}))
+        )
+        worst = max(c.score for c in illiquid.components if c.score is not None)
+        assert illiquid.risk_score >= worst * risk_mod.WORST_COMPONENT_FLOOR
+        assert illiquid.overall == "HIGH"
+
+    def test_synthetic_and_conflicting_data_floor_the_data_component(self, bundle):
+        clean = ver.finalize([], 0.9, 1.0, 1.0, True, False, provenance())
+        synthetic = ver.finalize([], 0.1, 1.0, 1.0, True, True, provenance())
+        conflicting = ver.finalize(
+            [
+                VerificationClaim(
+                    key="price",
+                    claim="Current price",
+                    status="CONFLICTING",
+                    confidence=0.3,
+                    sources_checked=2,
+                    independent_origins=2,
+                    values=[],
+                    detail="",
+                )
+            ],
+            0.9,
+            1.0,
+            1.0,
+            True,
+            False,
+            provenance(),
+        )
+        good = self.assess(bundle, verification=clean).components
+        fake = self.assess(bundle, verification=synthetic, is_synthetic=True).components
+        clashing = self.assess(bundle, verification=conflicting).components
+        score_of = lambda comps: next(c.score for c in comps if c.key == "data")  # noqa: E731
+        assert score_of(good) < risk_mod.SEVERE_DATA_FLOOR
+        assert score_of(fake) >= risk_mod.SEVERE_DATA_FLOOR
+        assert score_of(clashing) >= risk_mod.SEVERE_DATA_FLOOR
+
+    def test_stale_data_raises_the_data_component(self, bundle):
+        report = ver.finalize([], 0.9, 0.2, 1.0, True, False, provenance())
+        fresh = self.assess(bundle, verification=report).components
+        stale = self.assess(
+            bundle, verification=report, stale=True, stale_message="50 minutes old"
+        ).components
+        score_of = lambda comps: next(c.score for c in comps if c.key == "data")  # noqa: E731
+        assert score_of(stale) > score_of(fresh)
+
+    def test_verification_not_run_means_data_risk_is_not_guessed(self, bundle):
+        risk = self.assess(bundle, verification=None)
+        data = next(c for c in risk.components if c.key == "data")
+        assert data.score is None and risk.data_risk == "UNKNOWN" and risk.coverage_pct == 70.0
+
+    def test_the_research_score_risk_component_mirrors_the_risk_score(self, bundle):
+        from app.research.config import DEFAULT_WEIGHTS
+        from app.research.scoring import ScoringInput, score_symbol
+
+        risk = self.assess(bundle)
+        result = score_symbol(
+            ScoringInput(
+                price=bundle.price,
+                volatility=bundle.volatility,
+                technical=bundle.technical,
+                historical=None,
+                risk=risk,
+                market=market_context(),
+                sector=None,
+                source_key="candles_15m",
+                thresholds=DEFAULT_THRESHOLDS,
+            ),
+            DEFAULT_WEIGHTS,
+        )
+        component = next(c for c in result.components if c.key == "risk")
+        assert component.metrics["risk_score"] == risk.risk_score
+        assert component.points == pytest.approx(component.max_points * (1 - risk.risk_score / 100), abs=0.01)

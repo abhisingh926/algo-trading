@@ -19,7 +19,12 @@ from app.research.contracts import (
     SectorSnapshot,
 )
 
-INDEX_NAMES = {"NIFTY": "NIFTY 50", "BANKNIFTY": "BANK NIFTY", "INDIAVIX": "INDIA VIX"}
+INDEX_NAMES = {
+    "NIFTY": "NIFTY 50",
+    "BANKNIFTY": "BANK NIFTY",
+    "FINNIFTY": "NIFTY FINANCIAL SERVICES",
+    "INDIAVIX": "INDIA VIX",
+}
 UNAVAILABLE_MARKET_INPUTS = [
     "US overnight and Asian markets",
     "USD/INR",

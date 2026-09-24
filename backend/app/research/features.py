@@ -20,6 +20,8 @@ from app.research.contracts import (
     TimeframeTechnical,
     VolatilityBlock,
 )
+from app.research.sessions import market_state
+from app.research.verification import freshness_label
 
 MIN_SESSIONS = 25
 LAST_15M_BAR_START = 360  # minutes into the session at which the final 15-minute bar opens (15:15 IST)
@@ -405,6 +407,7 @@ def build_bundle(inp: SymbolInput, timeframes: list[str]) -> TechnicalBundle:
     ]
 
     stale_minutes = max((inp.as_of - data_as_of).total_seconds() / 60, 0)
+    state = market_state(inp.as_of)
     provenance = Provenance(
         source=inp.source_name,
         source_type=inp.source_type,
@@ -412,6 +415,8 @@ def build_bundle(inp: SymbolInput, timeframes: list[str]) -> TechnicalBundle:
         retrieved_at=inp.retrieved_at,
         confidence=inp.source_reliability,
         stale=False,
+        freshness=freshness_label(stale_minutes, state, stale=False),
+        age_minutes=round(stale_minutes, 1),
         note=(
             None
             if stale_minutes < 1

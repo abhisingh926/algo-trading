@@ -408,6 +408,18 @@ class ResearchOrchestrator:
                 "duration_ms": total("ResearchSynthesizerAgent"),
                 "message": f"Built {n} reports",
             },
+            "ResearchQualityAgent": {
+                "status": "SUCCESS" if n else "FAILED",
+                "records": n,
+                "duration_ms": total("ResearchQualityAgent"),
+                "message": _quality_message(outcomes),
+                "warnings": [
+                    f"{symbol}: {c.message}"
+                    for symbol, outcome in outcomes.items()
+                    for c in outcome.report.quality_checks
+                    if c.status != "PASS"
+                ][:20],
+            },
         }
         if depth["verification"]:
             stats["DataVerificationAgent"] = {
@@ -486,6 +498,15 @@ class ResearchOrchestrator:
             ctx.thresholds,
         )
         return context, points
+
+
+def _quality_message(outcomes: dict[str, SymbolOutcome]) -> str:
+    if not outcomes:
+        return "No reports to check"
+    counts: dict[str, int] = {}
+    for outcome in outcomes.values():
+        counts[outcome.report.quality_status] = counts.get(outcome.report.quality_status, 0) + 1
+    return ", ".join(f"{count} {status}" for status, count in sorted(counts.items()))
 
 
 def ctx_sector(ctx: RunContext, symbol: str) -> str | None:

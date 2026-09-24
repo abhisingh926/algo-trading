@@ -12,6 +12,7 @@ from app.models.research import (
     ResearchAgentOutput,
     ResearchCandidate,
     ResearchClaim,
+    ResearchDataQualityEvent,
     ResearchHistoricalPattern,
     ResearchMarketSnapshot,
     ResearchRiskEvent,
@@ -23,10 +24,12 @@ from app.models.research import (
 from app.repositories.instrument_repository import InstrumentRepository
 from app.repositories.research_repository import (
     ResearchAgentRunRepository,
+    ResearchCalibrationRepository,
     ResearchCandidateRepository,
     ResearchClaimRepository,
     ResearchOutputRepository,
     ResearchPatternRepository,
+    ResearchQualityRepository,
     ResearchRiskEventRepository,
     ResearchRunRepository,
     ResearchScoreRepository,
@@ -40,7 +43,7 @@ from app.research.contracts import AgentOutput, MarketContext, ScannerCandidate
 from app.research.pipeline import SymbolOutcome
 from app.utils.time import utcnow
 
-INDEX_SYMBOLS = ("NIFTY", "BANKNIFTY", "INDIAVIX")
+INDEX_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "INDIAVIX")
 
 
 @dataclass(slots=True)
@@ -96,12 +99,15 @@ class ResearchStore:
         weights: ResearchWeightRepository,
         universe: ResearchUniverseRepository,
         sources: ResearchSourceRepository,
+        calibration: ResearchCalibrationRepository,
+        quality: ResearchQualityRepository,
         instruments: InstrumentRepository,
         provider_name: str,
     ) -> None:
         self.runs, self.agent_runs, self.candidates, self.scores = runs, agent_runs, candidates, scores
         self.outputs, self.claims, self.snapshots, self.patterns = outputs, claims, snapshots, patterns
         self.risk_events, self.weights, self.universe, self.sources = risk_events, weights, universe, sources
+        self.calibration, self.quality = calibration, quality
         self.instruments = instruments
         self.provider_name = provider_name
 
@@ -287,6 +293,7 @@ class ResearchStore:
                 as_of=report.as_of,
                 research_score=report.research_score,
                 data_confidence=report.data_confidence,
+                risk_score=report.risk_score,
                 coverage_pct=report.score_coverage_pct,
                 direction=report.direction,
                 setup_quality=report.setup_quality,
@@ -376,6 +383,19 @@ class ResearchStore:
                         for s in report.historical.setups
                     ]
                 )
+            await self.quality.add_many(
+                [
+                    ResearchDataQualityEvent(
+                        run_id=run_id,
+                        symbol=symbol,
+                        check_key=c.key,
+                        status=c.status,
+                        message=c.message,
+                        detail=c.detail,
+                    )
+                    for c in report.quality_checks
+                ]
+            )
             await self.risk_events.add_many(
                 [
                     ResearchRiskEvent(

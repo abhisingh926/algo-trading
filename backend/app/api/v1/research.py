@@ -170,6 +170,31 @@ async def replace_universe(name: str, body: UniverseWrite, services: ServicesDep
     return ok(await services.research.replace_universe(name, body), "Universe updated")
 
 
+# ---- calibration: did the scores correspond to anything? ----------------------------------------------------------
+@router.post("/runs/{run_id}/calibrate", response_model=ApiResponse[dict])
+async def calibrate_run(run_id: str, services: ServicesDep, force: bool = False):
+    """Measure the market that followed each score in this run. Needs an hour of trading to have passed."""
+    result = await services.calibration.calibrate_run(run_id, force=force)
+    return ok(result, "Calibration complete", description=result["summary"]["verdict"])
+
+
+@router.get("/runs/{run_id}/calibration", response_model=ApiResponse[dict])
+async def run_calibration(run_id: str, services: ServicesDep):
+    return ok(await services.calibration.run_results(run_id), "Run calibration")
+
+
+@router.get("/calibration", response_model=ApiResponse[dict])
+async def calibration(services: ServicesDep):
+    """Outcomes by score bucket across every calibrated run. Measured results, not a prediction."""
+    result = await services.calibration.overall()
+    return ok(result, "Score calibration", description=result["summary"]["verdict"])
+
+
+@router.get("/calibration/pending", response_model=ApiResponse[list[dict]])
+async def calibration_pending(services: ServicesDep):
+    return ok(await services.calibration.pending_runs(), "Runs ready to calibrate")
+
+
 # ---- per stock (declared last so fixed paths above win) -----------------------------------------------------------
 @router.get("/{symbol}", response_model=ApiResponse[ResearchReport])
 async def report(symbol: str, services: ServicesDep, run_id: str | None = None):
@@ -205,6 +230,34 @@ async def risk(symbol: str, services: ServicesDep, run_id: str | None = None):
 @router.get("/{symbol}/sources", response_model=ApiResponse[SourcesView])
 async def sources(symbol: str, services: ServicesDep, run_id: str | None = None):
     return ok(await services.research.sources(symbol, run_id), "Sources and verification")
+
+
+@router.get("/{symbol}/verification", response_model=ApiResponse[SourcesView])
+async def verification(symbol: str, services: ServicesDep, run_id: str | None = None):
+    """Claims, their status and the sources behind them."""
+    return ok(await services.research.sources(symbol, run_id), "Data verification")
+
+
+@router.get("/{symbol}/agent-trace", response_model=ApiResponse[list[dict]])
+async def agent_trace(symbol: str, services: ServicesDep, run_id: str | None = None):
+    """What each agent did for this report, so the research is auditable."""
+    return ok(await services.research.agent_trace(symbol, run_id), "Agent trace")
+
+
+@router.get("/{symbol}/corporate-events")
+async def corporate_events(symbol: str):
+    raise NotAvailableYetError(
+        "No corporate events source is connected yet. Results, board meetings and corporate actions are planned "
+        "for phase 2 and need exchange filings or a data vendor."
+    )
+
+
+@router.get("/{symbol}/derivatives")
+async def derivatives(symbol: str):
+    raise NotAvailableYetError(
+        "No derivatives data source is connected yet. Futures, open interest, options chain, put-call ratio and "
+        "implied volatility need an options and futures feed."
+    )
 
 
 @router.get("/{symbol}/news")
